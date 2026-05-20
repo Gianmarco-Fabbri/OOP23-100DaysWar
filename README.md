@@ -165,12 +165,12 @@ This project was developed by a team of four as part of a university course.
 | **Fabbri** | 🏃 Soldier system & interactions · 🤖 AI bot · 📊 Real-time statistics |
 | **Francalanci** | ⚔️ Combat system · 📅 Turn management · 📜 In-game manual · 🏆 End-game logic |
 
-### 🖥️ Bartolini
+### 💰 Bartolini
 **Riccardo Bartolini** — [@Riccardo-Bartolini](https://github.com/Riccardo-Bartolini)
 - Implementation of the **coin system**, the related shop menu, and its display in the main game panel
 - Implementation and visualization of the **game map**
 
-### 💰 Balzani
+### 🖥️ Balzani
 **Riccardo Balzani** — [@FrittatinaDiBucatini09](https://github.com/FrittatinaDiBucatini09)
 - Implementation and visualization of **defensive towers** and their interactions
 - Implementation and visualization of the **dice** system
