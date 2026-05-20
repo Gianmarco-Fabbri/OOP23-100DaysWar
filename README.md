@@ -24,7 +24,7 @@
 **100 Days War** is a simplified, single-player strategy game where the player competes against an AI bot on a procedurally generated map. Each match spans **100 virtual days** — every day is simulated within a few seconds — and the goal is to conquer the opponent's spawn cell or control the most territory by the end of the war.
 
 > **University Project** — Developed as part of the *Object-Oriented Programming* course (A.Y. 2023/2024) at the [University of Bologna](https://www.unibo.it/).
-
+> **Bachelor Degree in [Computer Science and Engineering](https://corsi.unibo.it/laurea/IngegneriaScienzeInformatiche)**.
 ---
 
 ## 🎮 How It Works
