@@ -160,8 +160,8 @@ This project was developed by a team of four as part of a university course.
 
 | Member | Responsibilities |
 |:-------|:-----------------|
-| **Bartolini** | 🖥️ Start menu UI · 🗺️ Game map rendering · 🛡️ Tower system & interactions |
-| **Balzani** | 💰 Coin system & shop UI · 🎲 Dice implementation · 💾 Save & load functionality |
+| **Bartolini** | 💰 Coin system & shop UI · 🗺️ Game map rendering · 🧩 Towers interaction logic  |
+| **Balzani** | 🖥️ Start menu UI · 🎲 Dice implementation · 💾 Save & load functionality · 🛡️ Tower system |
 | **Fabbri** | 🏃 Soldier system & interactions · 🤖 AI bot · 📊 Real-time statistics |
 | **Francalanci** | ⚔️ Combat system · 📅 Turn management · 📜 In-game manual · 🏆 End-game logic |
 
@@ -169,10 +169,11 @@ This project was developed by a team of four as part of a university course.
 **Riccardo Bartolini** — [@Riccardo-Bartolini](https://github.com/Riccardo-Bartolini)
 - Implementation of the **coin system**, the related shop menu, and its display in the main game panel
 - Implementation and visualization of the **game map**
+- Implementation of the *towers interaction* logic
 
 ### 🖥️ Balzani
 **Riccardo Balzani** — [@FrittatinaDiBucatini09](https://github.com/FrittatinaDiBucatini09)
-- Implementation and visualization of **defensive towers** and their interactions
+- Implementation and visualization of **defensive towers**
 - Implementation and visualization of the **dice** system
 - Implementation and visualization of the **start menu** panel
 - Management of **game save and load** functionality
