@@ -1,63 +1,212 @@
-# Obiettivo del Gruppo
+<p align="center">
+  <img src="src/main/resources/startmenu/simpleLogo.png" alt="100 Days War Logo" width="200"/>
+</p>
 
-Il gruppo si pone di realizzare una versione semplificata del gioco [Conq.io](https://www.conq.io/).
+<h1 align="center">⚔️ 100 Days War</h1>
 
-All'avvio dell'applicazione, l'utente sarà invitato a inserire uno username. Successivamente, attraverso un menù interattivo, sarà possibile scegliere tra il caricamento dell'ultimo salvataggio o l'inizio di una nuova partita.  
-Ogni partita si svolge su una mappa generata proceduralmente, con celle di spawn assegnate rispettivamente al giocatore e al bot avversario. Il gioco si articola in un ciclo temporale di 100 giorni virtuali, in cui ogni giorno viene simulato in un intervallo di qualche secondo. Il giocatore non è obbligato a effettuare una mossa ogni giorno, ma trascorsi 4 giorni consecutivi il turno verrà automaticamente ceduto all'avversario.
+<p align="center">
+  <em>A turn-based strategy game inspired by <a href="https://www.conq.io/">Conq.io</a>, built with Java &amp; Swing.</em>
+</p>
 
-Durante ogni turno, il giocatore accumula risorse sotto forma di monete, utilizzabili per posizionare o potenziare unità difensive (torri) o offensive (soldati). Le azioni disponibili includono la costruzione di torri difensive o il movimento di soldati già piazzati sulla mappa. I soldati possono essere potenziati fino a un livello massimo pari a 3, mentre le torri difensive possono raggiungere un livello massimo pari a 4. Se un soldato viene mosso in una cella occupata da un'unità nemica, inizia un combattimento risolto attraverso un sistema di lancio di dadi, proporzionale al livello delle unità coinvolte. La vittoria viene assegnata al giocatore che ottiene il punteggio totale più alto con i propri dadi.
+<p align="center">
+  <a href="https://github.com/Gianmarco-Fabbri/OOP23-100DaysWar/blob/main/LICENSE"><img src="https://img.shields.io/github/license/Gianmarco-Fabbri/OOP23-100DaysWar?style=for-the-badge&color=blue" alt="License"></a>
+  <a href="https://www.java.com/"><img src="https://img.shields.io/badge/Java-17+-orange?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java 17+"></a>
+  <a href="https://gradle.org/"><img src="https://img.shields.io/badge/Gradle-Build-02303A?style=for-the-badge&logo=gradle&logoColor=white" alt="Gradle"></a>
+  <a href="https://github.com/Gianmarco-Fabbri/OOP23-100DaysWar/releases"><img src="https://img.shields.io/github/v/release/Gianmarco-Fabbri/OOP23-100DaysWar?style=for-the-badge&color=green" alt="Release"></a>
+  <a href="https://github.com/Gianmarco-Fabbri/OOP23-100DaysWar"><img src="https://img.shields.io/github/stars/Gianmarco-Fabbri/OOP23-100DaysWar?style=for-the-badge&color=yellow" alt="Stars"></a>
+  <a href="https://github.com/Gianmarco-Fabbri/OOP23-100DaysWar/issues"><img src="https://img.shields.io/github/issues/Gianmarco-Fabbri/OOP23-100DaysWar?style=for-the-badge" alt="Issues"></a>
+</p>
 
-La partita può concludersi prima dei 100 giorni se un giocatore riesce a conquistare la cella di spawn dell'avversario. In caso contrario, al termine del periodo, la vittoria verrà assegnata al giocatore che controlla il maggior numero di celle.
+---
 
-## Funzionalità Minime Ritenute Obbligatorie
+## 📖 About
 
-- Implementazione logica e grafica del menù iniziale di gioco.
-- Implementazione logica e grafica del pannello di gioco composto da una mappa su cui si svolge la partita e menù di posizionamento, potenziamento e movimento dei soldati.
-- Implementazione di un manuale che illustra le regole dettagliate di gioco e le varie componenti.
-- Gestione dei turni di gioco tra player e bot.
-- Gestione del movimento dei soldati sulla mappa.
-- Gestione della difesa offerta dalle torri.
-- Gestione del combattimento tra due soldati.
-- Gestione delle statistiche di gioco in tempo reale.
-- Gestione del termine della partita.
-- Gestione del salvataggio e del caricamento dell’ultima partita in corso.
+**100 Days War** is a simplified, single-player strategy game where the player competes against an AI bot on a procedurally generated map. Each match spans **100 virtual days** — every day is simulated within a few seconds — and the goal is to conquer the opponent's spawn cell or control the most territory by the end of the war.
 
-## Funzionalità Ritenute Opzionali
+> **University Project** — Developed as part of the *Object-Oriented Programming* course (A.Y. 2023/2024) at the [University of Bologna](https://www.unibo.it/).
 
-- Aggiunta di diverse tipologie di torri difensive con relativa modifica del menù.
-- Miglioramento strategia del bot avversario.
-- Implementazione logica e grafica di caselle bonus.
+---
 
-## Challenge Principali
+## 🎮 How It Works
 
-- Corretto utilizzo del pattern architetturale **MVC (Model-View-Controller)**, con relativa gestione delle dipendenze fra Model, View e Controller e buon design.
-- Corretto utilizzo del software di controllo versione **Git**, come strumento per la collaborazione.
-- Adeguata suddivisione del lavoro all’interno del gruppo.
-- Controllo velocità di scorrimento dei giorni.
+1. **🏁 Launch** — Enter a username, then choose to start a new game or load a previous save.
+2. **🗺️ Map Generation** — A procedurally generated grid assigns spawn cells to the player and the bot.
+3. **📅 Day Cycle** — The game runs for up to 100 days. If a player doesn't make a move for **4 consecutive days**, the turn automatically passes.
+4. **💰 Economy** — Earn coins each turn to buy, place, or upgrade units.
+5. **🛡️ Defense** — Build **defensive towers** (up to level 4) to protect your territory.
+6. **⚔️ Offense** — Deploy and move **soldiers** (up to level 3) across the map.
+7. **🎲 Combat** — When a soldier enters an enemy-occupied cell, combat is resolved via a **dice-roll system** scaled by each unit's level. Highest total wins.
+8. **🏆 Victory** — Capture the opponent's spawn cell for an early win, or hold the most cells after 100 days.
 
-## Suddivisione del Lavoro
+---
 
-### Bartolini
+## 🏗️ Architecture
 
-- Implementazione e visualizzazione del pannello iniziale.
-- Implementazione e visualizzazione della mappa di gioco.
-- Implementazione e visualizzazione delle torri difensive e delle loro interazioni.
+The project follows the **Model-View-Controller (MVC)** architectural pattern, ensuring a clean separation of concerns across the codebase.
 
-### Balzani
+```mermaid
+graph TB
+    subgraph View["🖥️ View — Swing UI"]
+        StartMenu["Start Menu"]
+        GameView["Game Panel"]
+        MapView["Map Renderer"]
+        DiceView["Dice Animation"]
+        StatsView["Statistics Panel"]
+        PauseMenu["Pause Menu"]
+        GameOver["Game Over Screen"]
+        Rules["Rules / Manual"]
+    end
 
-- Implementazione del sistema di monete, del relativo menù e della visualizzazione nel pannello di gioco principale.
-- Implementazione e visualizzazione dei dadi.
-- Gestione del salvataggio e del caricamento della partita.
+    subgraph Controller["🎛️ Controller"]
+        MainCtrl["Main Controller"]
+        GameCtrl["Game Controller"]
+        MapCtrl["Map Controller"]
+        MoveCtrl["Movement Controller"]
+        ShopCtrl["Shop Controller"]
+        StatsCtrl["Statistics Controller"]
+    end
 
-### Fabbri
+    subgraph Model["📦 Model — Game Logic"]
+        Player["Player & Bot"]
+        Map["Map & Cells"]
+        Units["Soldiers & Towers"]
+        Fight["Combat System"]
+        Dice["Dice Engine"]
+        Turn["Turn Manager"]
+        Bank["Bank Account"]
+        Stats["Statistics"]
+        SaveLoad["Save / Load"]
+        Pathfinder["Pathfinder"]
+    end
 
-- Implementazione e visualizzazione dei soldati e delle loro interazioni.
-- Implementazione del bot avversario.
-- Implementazione e visualizzazione delle statistiche di gioco in tempo reale.
+    View <-->|"User events & UI updates"| Controller
+    Controller <-->|"State queries & mutations"| Model
+```
 
-### Francalanci
+---
 
-- Implementazione e visualizzazione del combattimento fra soldati.
-- Implementazione e visualizzazione dello scorrimento dei turni di gioco.
-- Implementazione logica e grafica del manuale di gioco.
-- Gestione del termine della partita.
+## ✨ Features
+
+### Core Features
+
+| Feature | Description |
+|:--------|:------------|
+| 🗺️ **Procedural Map** | Dynamically generated grid with spawn points and obstacles |
+| 🤖 **AI Opponent** | Bot with strategic decision-making |
+| ⚔️ **Dice Combat** | Level-scaled dice-roll battle resolution |
+| 💰 **Economy System** | Coin-based purchasing and upgrading of units |
+| 🛡️ **Tower Defense** | Multiple tower types with up to 4 upgrade levels |
+| 🏃 **Soldier Movement** | Pathfinding-based soldier deployment and repositioning |
+| 📊 **Live Statistics** | Real-time game stats displayed during play |
+| 💾 **Save & Load** | Persist and resume your last game session |
+| 📜 **In-Game Manual** | Detailed rules and gameplay guide |
+
+### Optional / Bonus Features
+
+| Feature | Description |
+|:--------|:------------|
+| 🏰 **Tower Variants** | Different defensive tower types with unique properties |
+| 🧠 **Smarter Bot** | Enhanced AI strategy |
+| ⭐ **Bonus Cells** | Special cells with unique effects on the map |
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- **Java 17** or higher
+- **Gradle** (wrapper included)
+
+### Run from Source
+
+```bash
+# Clone the repository
+git clone https://github.com/Gianmarco-Fabbri/OOP23-100DaysWar.git
+cd OOP23-100DaysWar
+
+# Build and run
+./gradlew run
+```
+
+### Run the Pre-Built JAR
+
+```bash
+java -jar OOP23-100DaysWar-all.jar
+```
+
+### Build a Fat JAR
+
+```bash
+./gradlew shadowJar
+# Output: build/libs/OOP23-100DaysWar-all.jar
+```
+
+---
+
+## 🧪 Testing
+
+The project includes **19 test classes** powered by JUnit 5.
+
+```bash
+./gradlew test
+```
+
+---
+
+## 🤝 Team & Contributions
+
+This project was developed by a team of four as part of a university course.
+
+| Member | Responsibilities |
+|:-------|:-----------------|
+| **Bartolini** | 🖥️ Start menu UI · 🗺️ Game map rendering · 🛡️ Tower system & interactions |
+| **Balzani** | 💰 Coin system & shop UI · 🎲 Dice implementation · 💾 Save & load functionality |
+| **Fabbri** | 🏃 Soldier system & interactions · 🤖 AI bot · 📊 Real-time statistics |
+| **Francalanci** | ⚔️ Combat system · 📅 Turn management · 📜 In-game manual · 🏆 End-game logic |
+
+### 🖥️ Bartolini
+
+- Implementation of the **coin system**, the related shop menu, and its display in the main game panel
+- Implementation and visualization of the **game map**
+
+### 💰 Balzani
+
+- Implementation and visualization of **defensive towers** and their interactions
+- Implementation and visualization of the **dice** system
+- Implementation and visualization of the **start menu** panel
+- Management of **game save and load** functionality
+
+### 🏃 Fabbri
+
+- Implementation and visualization of **soldiers** and their interactions
+- Implementation of the **AI bot** opponent
+- Implementation and visualization of **real-time game statistics**
+
+### ⚔️ Francalanci
+
+- Implementation and visualization of **soldier combat**
+- Implementation and visualization of **turn progression**
+- Implementation of the **in-game rules manual** (logic and UI)
+- Management of **end-of-game** conditions
+
+---
+
+## 🏛️ Key Design Challenges
+
+- ✅ Strict adherence to the **MVC pattern** with clean dependency management
+- ✅ Effective **Git collaboration** workflow across four team members
+- ✅ Balanced **workload distribution** and parallel development
+- ✅ Fine-tuned **day-cycle speed** control for optimal gameplay pacing
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
+
+---
+
+<p align="center">
+  Made with ❤️ at the University of Bologna
+</p>
