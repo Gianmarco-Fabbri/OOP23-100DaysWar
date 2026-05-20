@@ -166,24 +166,26 @@ This project was developed by a team of four as part of a university course.
 | **Francalanci** | ⚔️ Combat system · 📅 Turn management · 📜 In-game manual · 🏆 End-game logic |
 
 ### 🖥️ Bartolini
-
+**Riccardo Bartolini** — [@Riccardo-Bartolini](https://github.com/Riccardo-Bartolini)
 - Implementation of the **coin system**, the related shop menu, and its display in the main game panel
 - Implementation and visualization of the **game map**
 
 ### 💰 Balzani
-
+**Riccardo Balzani** — [@FrittatinaDiBucatini09](https://github.com/FrittatinaDiBucatini09)
 - Implementation and visualization of **defensive towers** and their interactions
 - Implementation and visualization of the **dice** system
 - Implementation and visualization of the **start menu** panel
 - Management of **game save and load** functionality
 
 ### 🏃 Fabbri
+**Gianmarco Fabbri** — [@gimbo](https://github.com/Gianmarco-Fabbri)
 
 - Implementation and visualization of **soldiers** and their interactions
 - Implementation of the **AI bot** opponent
 - Implementation and visualization of **real-time game statistics**
 
 ### ⚔️ Francalanci
+**Filippo Francalanci** — [@Filippo](https://github.com/FrancalanciFilippo)
 
 - Implementation and visualization of **soldier combat**
 - Implementation and visualization of **turn progression**
