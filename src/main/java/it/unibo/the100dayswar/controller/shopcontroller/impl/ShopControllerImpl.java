@@ -3,7 +3,7 @@ package it.unibo.the100dayswar.controller.shopcontroller.impl;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import it.unibo.the100dayswar.application.The100DaysWar;
+import it.unibo.the100dayswar.controller.maincontroller.api.MainController;
 import it.unibo.the100dayswar.commons.utilities.impl.Pair;
 import it.unibo.the100dayswar.controller.shopcontroller.api.ShopController;
 import it.unibo.the100dayswar.model.cell.api.Cell;
@@ -15,14 +15,25 @@ import it.unibo.the100dayswar.model.unit.api.Unit;
  */
 public class ShopControllerImpl implements ShopController {
     private static final Logger LOGGER = Logger.getLogger(ShopController.class.getName());
+    private final MainController mainController;
 
+    /**
+     * Constructor.
+     * @param mainController the main controller
+     */
+    public ShopControllerImpl(final MainController mainController) {
+        this.mainController = mainController;
+    }
     /** 
      * {@inheritDoc}
      */
     @Override
     public void buySoldier() {
-        The100DaysWar.CONTROLLER.getGameInstance().buySoldier();
-        The100DaysWar.CONTROLLER.getGameController().skip();
+        mainController.getGameInstance().buySoldier();
+        final Cell spawn = mainController.getGameInstance().getHumanPlayer().getSpawnPoint();
+        final Cell newCell = mainController.getMapController().getMap().getCell(spawn.getPosition());
+        mainController.getMapController().setSelectedCell(newCell);
+        mainController.getGameController().skip();
     }
 
     /** 
@@ -30,9 +41,11 @@ public class ShopControllerImpl implements ShopController {
      */
     @Override
     public void buyBasicTower() {
-        final Pair<Unit, Cell> selectedCell = The100DaysWar.CONTROLLER.getMapController().getSelectedCell();
-        The100DaysWar.CONTROLLER.getGameInstance().buyTower(TowerType.BASIC, selectedCell.getSecond());
-        The100DaysWar.CONTROLLER.getGameController().skip();
+        final Pair<Unit, Cell> selectedCell = mainController.getMapController().getSelectedCell();
+        mainController.getGameInstance().buyTower(TowerType.BASIC, selectedCell.getSecond());
+        final Cell newCell = mainController.getMapController().getMap().getCell(selectedCell.getSecond().getPosition());
+        mainController.getMapController().setSelectedCell(newCell);
+        mainController.getGameController().skip();
     }
 
     /** 
@@ -40,9 +53,11 @@ public class ShopControllerImpl implements ShopController {
      */
     @Override
     public void buyAdvancedTower() {
-        final Pair<Unit, Cell> selectedCell = The100DaysWar.CONTROLLER.getMapController().getSelectedCell();
-        The100DaysWar.CONTROLLER.getGameInstance().buyTower(TowerType.ADVANCED, selectedCell.getSecond());
-        The100DaysWar.CONTROLLER.getGameController().skip();
+        final Pair<Unit, Cell> selectedCell = mainController.getMapController().getSelectedCell();
+        mainController.getGameInstance().buyTower(TowerType.ADVANCED, selectedCell.getSecond());
+        final Cell newCell = mainController.getMapController().getMap().getCell(selectedCell.getSecond().getPosition());
+        mainController.getMapController().setSelectedCell(newCell);
+        mainController.getGameController().skip();
     }
 
     /** 
@@ -50,13 +65,19 @@ public class ShopControllerImpl implements ShopController {
      */
     @Override
     public void upgradeUnit() {
-        final Pair<Unit, Cell> selectedCell = The100DaysWar.CONTROLLER.getMapController().getSelectedCell();
+        final Pair<Unit, Cell> selectedCell = mainController.getMapController().getSelectedCell();
         final Unit unit = selectedCell.getFirst();
         if (unit == null) {
            LOGGER.log(Level.INFO, "Position is not valid");
            return;
         }
-        The100DaysWar.CONTROLLER.getGameInstance().upgradeUnit(unit);
-        The100DaysWar.CONTROLLER.getGameController().skip();
+        try {
+            mainController.getGameInstance().upgradeUnit(unit);
+            final Cell newCell = mainController.getMapController().getMap().getCell(selectedCell.getSecond().getPosition());
+            mainController.getMapController().setSelectedCell(newCell);
+            mainController.getGameController().skip();
+        } catch (IllegalStateException e) {
+            LOGGER.log(Level.INFO, "Unable to upgrade unit: " + e.getMessage());
+        }
     }
 }

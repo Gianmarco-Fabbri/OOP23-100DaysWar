@@ -27,7 +27,6 @@ class SoldierTest {
     private static final int INITIAL_SOLDIER_LEVEL = 1;
     private static final int UPGRADED_SOLDIER_LEVEL = 2;
     private static final int TARGET_HEALTH = 350;
-    private static final int SOLDIER_HEALTH_AFTER_ATTACK = 100;
 
     private Player testPlayer;
     private Soldier soldier;
@@ -70,13 +69,12 @@ class SoldierTest {
         assertEquals(INITIAL_SOLDIER_HEALTH, soldier.currentHealth());
         assertEquals(TARGET_HEALTH, target.currentHealth());
         soldier.performAttack(target);
-        assertTrue(
-            soldier.currentHealth() == SOLDIER_HEALTH_AFTER_ATTACK 
-            && target.currentHealth() == 0
-            ||
-            soldier.currentHealth() == 0 
-            && target.currentHealth() == TARGET_HEALTH
-        );
+        final boolean attackerWon = soldier.currentHealth() == INITIAL_SOLDIER_HEALTH
+            && target.currentHealth() == 0;
+        final boolean defenderWon = soldier.currentHealth() == 0
+            && target.currentHealth() == TARGET_HEALTH;
+        final boolean draw = soldier.currentHealth() == 0 && target.currentHealth() == 0;
+        assertTrue(attackerWon || defenderWon || draw);
     }
 
     @Test

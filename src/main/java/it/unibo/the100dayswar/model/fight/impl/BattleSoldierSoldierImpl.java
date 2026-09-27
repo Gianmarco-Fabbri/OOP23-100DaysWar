@@ -12,6 +12,9 @@ import it.unibo.the100dayswar.commons.utilities.impl.Pair;
 public class BattleSoldierSoldierImpl implements BattleSoldierSoldier {
 
     private final Dice dice;
+    private int lastAttackerRoll;
+    private int lastDefenderRoll;
+
     /** 
      * Constructor for the class BattleSoldierSoldier.
      */
@@ -22,7 +25,7 @@ public class BattleSoldierSoldierImpl implements BattleSoldierSoldier {
      * start a fight between two soldier.
      */
     @Override
-    public void startFight(final Soldier attacker, final Soldier defender) {
+    public boolean startFight(final Soldier attacker, final Soldier defender) {
         final Pair<Soldier, Soldier> result = resolveFight(attacker, defender);
         if (result.getFirst() != null && result.getSecond() != null) {
             result.getSecond().setHealth(0);
@@ -31,6 +34,7 @@ public class BattleSoldierSoldierImpl implements BattleSoldierSoldier {
             attacker.setHealth(0);
             defender.setHealth(0);
         }
+        return true;
     }
     /**
      * Resolve the fight between two soldiers.
@@ -40,16 +44,32 @@ public class BattleSoldierSoldierImpl implements BattleSoldierSoldier {
      * @return the pair of soldiers, the first is the winner, the second is the loser, both are null in case of draw
       */
     private Pair<Soldier, Soldier> resolveFight(final Soldier attacker, final Soldier defender) {
-        final int attackerRoll = calculateRollFromSoldier(attacker);
-        final int defenderRoll = calculateRollFromSoldier(defender);
+        lastAttackerRoll = calculateRollFromSoldier(attacker);
+        lastDefenderRoll = calculateRollFromSoldier(defender);
 
-        if (attackerRoll > defenderRoll) {
+        if (lastAttackerRoll > lastDefenderRoll) {
             return new Pair<>(attacker, defender);
-        } else if (attackerRoll < defenderRoll) {
+        } else if (lastAttackerRoll < lastDefenderRoll) {
             return new Pair<>(defender, attacker);
         } else {
             return new Pair<>(null, null);
         }
+    }
+
+    /**
+     * Returns the total dice roll of the attacker in the last fight.
+     * @return the attacker's roll
+     */
+    public int getLastAttackerRoll() {
+        return lastAttackerRoll;
+    }
+
+    /**
+     * Returns the total dice roll of the defender in the last fight.
+     * @return the defender's roll
+     */
+    public int getLastDefenderRoll() {
+        return lastDefenderRoll;
     }
     /**
      * Calculate the roll of a specific soldier.

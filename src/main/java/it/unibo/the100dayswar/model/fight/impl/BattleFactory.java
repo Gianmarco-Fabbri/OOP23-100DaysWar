@@ -1,40 +1,61 @@
 package it.unibo.the100dayswar.model.fight.impl;
 
 import it.unibo.the100dayswar.model.fight.api.Battle;
+import it.unibo.the100dayswar.model.map.api.GameMap;
 import it.unibo.the100dayswar.model.tower.api.Tower;
 import it.unibo.the100dayswar.model.unit.api.Combatant;
 import it.unibo.the100dayswar.model.soldier.api.Soldier;
 
 /**
- * inteface for creating istance of battle using the factory pattern.
+ * Factory class for creating instances of {@link Battle} using the factory pattern.
  */
 public final class BattleFactory {
+
+    private BattleFactory() {
+    }
+
     /**
-     * create an istance of battle.
+     * Creates the appropriate {@link Battle} implementation for the given pair of
+     * combatants. No line-of-sight map is injected; use the overload that accepts a
+     * {@link GameMap} when LOS checking is required for tower vs. soldier battles.
+     *
+     * @param <T>      the type of the attacker
+     * @param <U>      the type of the defender
+     * @param attacker the attacking combatant
+     * @param defender the defending combatant
+     * @return the {@link Battle} instance matching the combatant types
      */
-
-     private BattleFactory() {
-
-     }
-
-     /**
-      * is the function for creating the battle.
-      * @param <T>
-      * @param <U>
-      * @param attacker
-      * @param defender
-      * @return return the new type of battle required
-      */
     @SuppressWarnings("unchecked")
-    public static <T extends Combatant, U extends Combatant> Battle<T, U> createBattle(final T attacker, final U defender) {
-        if (attacker instanceof Soldier && defender instanceof Soldier) {
-            return (Battle<T, U>) new BattleSoldierSoldierImpl();
-        } else if (attacker instanceof Soldier && defender instanceof Tower) {
-            return (Battle<T, U>) new BattleSoldierTowerImpl();
-        } else if (attacker instanceof Tower && defender instanceof Soldier) {
-            return (Battle<T, U>) new BattleTowerSoldierImpl();
-        } else {
-            throw new IllegalArgumentException("Unsupported combatant types");
-        }
+    public static <T extends Combatant, U extends Combatant> Battle<T, U> createBattle(
+            final T attacker, final U defender) {
+        return switch (attacker) {
+            case Soldier s when defender instanceof Soldier -> (Battle<T, U>) new BattleSoldierSoldierImpl();
+            case Soldier s when defender instanceof Tower   -> (Battle<T, U>) new BattleSoldierTowerImpl();
+            case Tower   t when defender instanceof Soldier -> (Battle<T, U>) new BattleTowerSoldierImpl();
+            default -> throw new IllegalArgumentException("Unsupported combatant types");
+        };
+    }
+
+    /**
+     * Creates the appropriate {@link Battle} implementation for the given pair of
+     * combatants, injecting the supplied {@link GameMap} for line-of-sight checks
+     * when the battle is of the tower-vs-soldier type.
+     *
+     * @param <T>      the type of the attacker
+     * @param <U>      the type of the defender
+     * @param attacker the attacking combatant
+     * @param defender the defending combatant
+     * @param map      the game map used for obstacle/LOS checking
+     * @return the {@link Battle} instance matching the combatant types
+     */
+    @SuppressWarnings("unchecked")
+    public static <T extends Combatant, U extends Combatant> Battle<T, U> createBattle(
+            final T attacker, final U defender, final GameMap map) {
+        return switch (attacker) {
+            case Soldier s when defender instanceof Soldier -> (Battle<T, U>) new BattleSoldierSoldierImpl();
+            case Soldier s when defender instanceof Tower   -> (Battle<T, U>) new BattleSoldierTowerImpl();
+            case Tower   t when defender instanceof Soldier -> (Battle<T, U>) new BattleTowerSoldierImpl(map);
+            default -> throw new IllegalArgumentException("Unsupported combatant types");
+        };
     }
 }

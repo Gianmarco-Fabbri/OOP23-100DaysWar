@@ -11,6 +11,7 @@ import it.unibo.the100dayswar.model.cell.impl.CellImpl;
 import it.unibo.the100dayswar.model.map.api.MapManager;
 import it.unibo.the100dayswar.model.map.impl.MapManagerImpl;
 import it.unibo.the100dayswar.model.player.impl.PlayerImpl;
+import it.unibo.the100dayswar.model.player.api.Player;
 
 /**
  * A simple implementation of a bot player that uses a strategy
@@ -91,5 +92,13 @@ public class SimpleBot extends PlayerImpl implements BotPlayer {
     @Override
     public BotStrategy getStrategy() {
         return this.strategy;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Player copy() {
+        return new SimpleBot(this);
     }
 }

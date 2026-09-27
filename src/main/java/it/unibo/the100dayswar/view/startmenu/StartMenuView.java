@@ -14,8 +14,9 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 
-import it.unibo.the100dayswar.application.The100DaysWar;
+import it.unibo.the100dayswar.controller.maincontroller.api.MainController;
 import it.unibo.the100dayswar.commons.utilities.impl.IconLoader;
 import it.unibo.the100dayswar.commons.utilities.impl.LoadPixelFont;
 import it.unibo.the100dayswar.view.backgroundpanel.BackgroundPanel;
@@ -38,12 +39,15 @@ public class StartMenuView extends JFrame {
     private static final int HEIGHT = 80;
     private static final int MARGINS = 20;
 
+    private final transient MainController mainController;
+
     /**
      * Constructor of the class.
-     * 
+     * @param mainController the main controller
      */
-    public StartMenuView() {
+    public StartMenuView(final MainController mainController) {
         super("The100DaysWar");
+        this.mainController = mainController;
     }
 
     /**
@@ -52,8 +56,10 @@ public class StartMenuView extends JFrame {
      * @implNote this method must be final to avoid ConstructorCallsOverridableMethod.
      */
     public final void initialize() {
-        buildUI(); 
-        postInitialization();
+        SwingUtilities.invokeLater(() -> {
+            buildUI();
+            postInitialization();
+        });
     }
 
     /**
@@ -107,8 +113,8 @@ public class StartMenuView extends JFrame {
     private void startAction() {
         final Optional<String> name = NameWindow.askUsername(this);
         if (name.isPresent()) {
-            The100DaysWar.CONTROLLER.startNewGame(name.get());
-            new GameView().initialize();
+            mainController.startNewGame(name.get());
+            new GameView(mainController).initialize();
             dispose();
         }
     }
@@ -117,12 +123,16 @@ public class StartMenuView extends JFrame {
      * Defines the actions after pressing RESUME.
      */
     private void resumeAction() {
-        if (The100DaysWar.CONTROLLER.loadOldGame(LOADING_PATH)) {
-            new GameView().initialize();
-            dispose();
-        } else {
-            NoOldGameFoundWindow.show(this);
-        } 
+        mainController.loadOldGame(LOADING_PATH).thenAccept(success -> {
+            SwingUtilities.invokeLater(() -> {
+                if (success) {
+                    new GameView(mainController).initialize();
+                    dispose();
+                } else {
+                    NoOldGameFoundWindow.show(this);
+                }
+            });
+        });
     }
 
     /**
@@ -136,7 +146,7 @@ public class StartMenuView extends JFrame {
      * Defines the actions after pressing EXIT.
      */
     private void exitAction() {
-        ExitWindow.showDialog(this);
+        ExitWindow.showDialog(this, mainController);
     }
 
     /**

@@ -63,4 +63,16 @@ public interface MapController {
      * @return a list of adjacent cells
      */
     List<Cell> getAdjacentCells(Cell cell);
+
+    /**
+     * Clears the currently selected cell.
+     */
+    void clearSelectedCell();
+
+    /**
+     * Sets the selected cell.
+     *
+     * @param cell the cell to select
+     */
+    void setSelectedCell(Cell cell);
 }

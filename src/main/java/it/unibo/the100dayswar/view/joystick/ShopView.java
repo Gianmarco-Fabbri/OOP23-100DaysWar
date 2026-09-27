@@ -8,9 +8,8 @@ import java.awt.GridBagLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import it.unibo.the100dayswar.application.The100DaysWar;
-import it.unibo.the100dayswar.view.map.MapView;
-import it.unibo.the100dayswar.view.statistics.StatisticsView;
+import it.unibo.the100dayswar.controller.events.GameUpdateEvent;
+import it.unibo.the100dayswar.controller.maincontroller.api.MainController;
 
 /**
  * Class that represents the shop panel in the joystick view.
@@ -28,13 +27,15 @@ public class ShopView extends JPanel {
     private final JButton buyAdvancedTower;
     private final JButton upgradeUnit;
 
+    private final transient MainController mainController;
+
     /**
      * Constructor for the ShopView class.
      * 
-     * @param mapView the map view to repaint
-     * @param statisticsView the statistics view to update
+     * @param mainController the main controller
      */
-    public ShopView(final MapView mapView, final StatisticsView statisticsView) {
+    public ShopView(final MainController mainController) {
+        this.mainController = mainController;
         super.setLayout(new GridBagLayout());
 
         this.buySoldier = ButtonFactory.createCustomButton(
@@ -66,7 +67,7 @@ public class ShopView extends JPanel {
             Color.WHITE
         );
 
-        setButtonActions(mapView, statisticsView);
+        setButtonActions();
         setupLayout();
         super.setPreferredSize(SIZE);
     }
@@ -93,30 +94,23 @@ public class ShopView extends JPanel {
 
     /**
      * Sets the actions for the buttons.
-     * 
-     * @param mapView the map view to repaint
-     * @param statisticsView the statistics view to update
      */
-    private void setButtonActions(final MapView mapView, final StatisticsView statisticsView) {
+    private void setButtonActions() {
         buySoldier.addActionListener(e -> {
-            The100DaysWar.CONTROLLER.getShopController().buySoldier();
-            mapView.repaint();
-            statisticsView.updateStatisticView();
+            mainController.getShopController().buySoldier();
+            mainController.getEventBus().publish(new GameUpdateEvent());
         });
         buyBasicTower.addActionListener(e -> {
-            The100DaysWar.CONTROLLER.getShopController().buyBasicTower();
-            mapView.repaint();
-            statisticsView.updateStatisticView();
+            mainController.getShopController().buyBasicTower();
+            mainController.getEventBus().publish(new GameUpdateEvent());
         });
         buyAdvancedTower.addActionListener(e -> {
-            The100DaysWar.CONTROLLER.getShopController().buyAdvancedTower();
-            mapView.repaint();
-            statisticsView.updateStatisticView();
+            mainController.getShopController().buyAdvancedTower();
+            mainController.getEventBus().publish(new GameUpdateEvent());
         });
         upgradeUnit.addActionListener(e -> {
-            The100DaysWar.CONTROLLER.getShopController().upgradeUnit();
-            mapView.repaint();
-            statisticsView.updateStatisticView();
+            mainController.getShopController().upgradeUnit();
+            mainController.getEventBus().publish(new GameUpdateEvent());
         });
     }
 

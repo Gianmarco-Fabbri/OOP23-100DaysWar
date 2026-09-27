@@ -14,7 +14,9 @@ import it.unibo.the100dayswar.model.tower.api.Tower;
 import it.unibo.the100dayswar.model.turn.api.GameTurnManager;
 import it.unibo.the100dayswar.model.unit.api.Unit;
 import it.unibo.the100dayswar.model.turn.api.GameDay;
-import it.unibo.the100dayswar.model.fight.impl.GenericBattleCommand;
+import it.unibo.the100dayswar.model.fight.impl.BattleFactory;
+import it.unibo.the100dayswar.model.map.api.GameMap;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * Class that implement the interface GameTurnManager.
@@ -31,6 +33,9 @@ public class GameTurnManagerImpl implements GameTurnManager {
     private int daysNoMove;
     private final GameDay gameDay;
     private transient Timer timer;
+    private transient Runnable updateCallback;
+    private transient GameMap gameMap;
+    private transient java.util.function.Consumer<Pair<Integer, Integer>> towerShotCallback;
 
     /**
      * Constructor of GameTurnManagerImpl.
@@ -94,6 +99,9 @@ public class GameTurnManagerImpl implements GameTurnManager {
             ((BotPlayer) getCurrentPlayer()).makeMove();
             switchTurn();
         }
+        if (this.updateCallback != null) {
+            this.updateCallback.run();
+        }
     }
     /**
      * increase the Turn counter.
@@ -121,6 +129,9 @@ public class GameTurnManagerImpl implements GameTurnManager {
         }
         if (this.gameDay.getCurrentDay() >= this.gameDay.getMaxDay()) {
             stopTimer();
+        }
+        if (this.updateCallback != null) {
+            this.updateCallback.run();
         }
     }
     /**
@@ -151,15 +162,30 @@ public class GameTurnManagerImpl implements GameTurnManager {
     }
 
     /**
+     * Sets the game map used for line-of-sight checks during tower attacks.
+     *
+     * @param gameMap the current game map
+     */
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP2",
+            justification = "GameMap is an interface; storing the reference is intentional and safe")
+    public void setGameMap(final GameMap gameMap) {
+        this.gameMap = gameMap;
+    }
+
+    /**
      * a method for tower for the attacker to attack the defender soldier.
-     * @param attacker
-     * @param defender
+     * When a {@link GameMap} has been injected via {@link #setGameMap(GameMap)},
+     * line-of-sight checking via Bresenham is performed before dealing damage.
+     *
+     * @param attacker the attacking player
+     * @param defender the defending player
      */
     private void towerAttack(final Player attacker, final Player defender) {
-        final GenericBattleCommand<Tower, Soldier> battle = new GenericBattleCommand<>();
         for (final Tower t : attacker.getTowers()) {
             for (final Soldier s : defender.getSoldiers()) {
-                battle.execute(t, s);
+                if (BattleFactory.createBattle(t, s, gameMap).startFight(t, s) && this.towerShotCallback != null) {
+                    this.towerShotCallback.accept(new Pair<>(t.getDamage(), s.currentHealth()));
+                }
             }
         }
     }
@@ -184,5 +210,19 @@ public class GameTurnManagerImpl implements GameTurnManager {
                 p.removeUnit(source.getSecond());
             }
         });
+    }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setUpdateCallback(final Runnable callback) {
+        this.updateCallback = callback;
+    }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setTowerShotCallback(final java.util.function.Consumer<Pair<Integer, Integer>> callback) {
+        this.towerShotCallback = callback;
     }
 }

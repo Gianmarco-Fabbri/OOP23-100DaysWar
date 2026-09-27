@@ -27,7 +27,10 @@ public final class IconLoader {
      * @return the icon created
      */
     public static Icon loadIcon(final String path) {
-        return Optional.ofNullable(ClassLoader.getSystemResource(path))
+        // Normalize path: class.getResource() needs a leading '/' for classpath-root resources.
+        // Support both styles (e.g. "startmenu/bg.jpg" and "/gameview/bg.jpg").
+        final String normalizedPath = path.startsWith("/") ? path : "/" + path;
+        return Optional.ofNullable(IconLoader.class.getResource(normalizedPath))
             .map(ImageIcon::new)
             .orElseGet(() -> {
                 LOGGER.log(Level.WARNING, "The icon at path " + path + " wasn't loaded.");

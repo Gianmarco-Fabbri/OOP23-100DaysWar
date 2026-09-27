@@ -9,12 +9,11 @@ import java.awt.Insets;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import it.unibo.the100dayswar.application.The100DaysWar;
-import it.unibo.the100dayswar.view.map.MapView;
+import it.unibo.the100dayswar.controller.events.GameUpdateEvent;
+import it.unibo.the100dayswar.controller.maincontroller.api.MainController;
 import it.unibo.the100dayswar.view.pausemenu.PauseMenu;
 import it.unibo.the100dayswar.view.quit.ExitWindow;
 import it.unibo.the100dayswar.view.rules.RulesViewer;
-import it.unibo.the100dayswar.view.statistics.StatisticsView;
 
 /** 
  * Class that represents the control panel in the joystick view.
@@ -34,13 +33,15 @@ public class ControlView extends JPanel {
     private final JButton rules;
     private final JButton quit;
 
+    private final transient MainController mainController;
+
     /**
      * Constructor for the ControlView class.
      * 
-     * @param mapView the map view to repaint
-     * @param statisticsView the statistics view to update
+     * @param mainController the main controller
      */
-    public ControlView(final MapView mapView, final StatisticsView statisticsView) {
+    public ControlView(final MainController mainController) {
+        this.mainController = mainController;
         super.setLayout(new GridBagLayout());
         final GridBagConstraints gbc = createGridBagConstraints();
 
@@ -50,7 +51,7 @@ public class ControlView extends JPanel {
         this.rules = ButtonFactory.createCustomButton("Read Rules", ICON_BUTTON, BUTTON_SIZE, FONT_SIZE, Color.WHITE);
         this.quit = ButtonFactory.createCustomButton("Quit", ICON_BUTTON, BUTTON_SIZE, FONT_SIZE, Color.WHITE);
 
-        setButtonActions(mapView, statisticsView);
+        setButtonActions();
         arrangeButtons(gbc);
 
         super.setPreferredSize(SIZE);
@@ -80,14 +81,11 @@ public class ControlView extends JPanel {
 
     /**
      * Sets actions for the control buttons.
-     * 
-     * @param mapView the map view to repaint
-     * @param statisticsView the statistics view to update
      */
-    private void setButtonActions(final MapView mapView, final StatisticsView statisticsView) {
-        attack.addActionListener(e -> attackAction(mapView, statisticsView));
+    private void setButtonActions() {
+        attack.addActionListener(e -> attackAction());
         pause.addActionListener(e -> pauseAction());
-        skip.addActionListener(e -> skipTurn(mapView, statisticsView));
+        skip.addActionListener(e -> skipTurn());
         rules.addActionListener(e -> rulesAction());
         quit.addActionListener(e -> exitAction());
     }
@@ -131,33 +129,25 @@ public class ControlView extends JPanel {
 
     /**
      * The action to be performed when the attack button is clicked.
-     * 
-     * @param mapView the map view to repaint
-     * @param statisticsView the statistics view to update
      */
-    private void attackAction(final MapView mapView, final StatisticsView statisticsView) {
-        The100DaysWar.CONTROLLER.getGameController().attack();
-        mapView.repaint();
-        statisticsView.updateStatisticView();
+    private void attackAction() {
+        mainController.getGameController().attack();
+        mainController.getEventBus().publish(new GameUpdateEvent());
     }
 
     /**
      * Skip the current turn without doing anything.
-     * 
-     * @param mapView the map view to repaint
-     * @param statisticsView the statistics view to update
      */
-    private void skipTurn(final MapView mapView, final StatisticsView statisticsView) {
-        The100DaysWar.CONTROLLER.getGameController().skip();
-        mapView.repaint();
-        statisticsView.updateStatisticView();
+    private void skipTurn() {
+        mainController.getGameController().skip();
+        mainController.getEventBus().publish(new GameUpdateEvent());
     }
 
     /** 
      * The action to be performed when the pause button is clicked.
      */
     private void pauseAction() {
-        new PauseMenu(null).initialize();
+        new PauseMenu(null, mainController).initialize();
     }
 
     /**
@@ -171,6 +161,6 @@ public class ControlView extends JPanel {
      * The action to be performed when the quit button is clicked.
      */
     private void exitAction() {
-        ExitWindow.showDialog(null);
+        ExitWindow.showDialog(null, mainController);
     }
 }

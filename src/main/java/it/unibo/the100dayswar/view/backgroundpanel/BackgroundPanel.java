@@ -12,7 +12,7 @@ import it.unibo.the100dayswar.commons.utilities.impl.IconLoader;
  */
 public class BackgroundPanel extends JPanel {
     private static final long serialVersionUID = 1L;
-    private final String imagePath;
+    private final ImageIcon backgroundImage;
 
     /**
      * Constructor of the class.
@@ -21,7 +21,7 @@ public class BackgroundPanel extends JPanel {
      * @param imagePath
      */
     public BackgroundPanel(final String imagePath) {
-        this.imagePath = imagePath;
+        this.backgroundImage = (ImageIcon) IconLoader.loadIcon(imagePath);
     }
 
     /**
@@ -30,11 +30,12 @@ public class BackgroundPanel extends JPanel {
     @Override
     protected void paintComponent(final Graphics graphic) {
         super.paintComponent(graphic);
-        final ImageIcon icon = (ImageIcon) IconLoader.loadIcon(imagePath);
-        if (icon != null && icon.getImage() != null) {
-            graphic.drawImage(icon.getImage(), 0, 0, getWidth(), getHeight(), this);
+        if (backgroundImage != null && backgroundImage.getImage() != null && backgroundImage.getIconWidth() > 0) {
+            graphic.drawImage(backgroundImage.getImage(), 0, 0, getWidth(), getHeight(), this);
         } else {
-            throw new IllegalArgumentException("Image not found");
+            // Se l'immagine non è trovata, disegniamo uno sfondo di fallback nero
+            graphic.setColor(java.awt.Color.BLACK);
+            graphic.fillRect(0, 0, getWidth(), getHeight());
         }
     }
 }

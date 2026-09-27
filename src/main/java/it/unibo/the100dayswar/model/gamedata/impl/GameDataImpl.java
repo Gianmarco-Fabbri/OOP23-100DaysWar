@@ -9,6 +9,8 @@ import it.unibo.the100dayswar.model.player.api.HumanPlayer;
 import it.unibo.the100dayswar.model.player.impl.HumanPlayerImpl;
 import it.unibo.the100dayswar.model.turn.api.GameTurnManager;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
  * Class that saves all the data that need to be serialized.
  */
@@ -29,6 +31,7 @@ public class GameDataImpl implements GameData {
      * @param mapManager the mapManager of the current game
      * @param gameTurnManager the game turn manager of the current game
      */
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Intentional")
     public GameDataImpl(
             final HumanPlayer human,
             final BotPlayer bot,
@@ -68,6 +71,7 @@ public class GameDataImpl implements GameData {
     /**
      * {@inheritDoc}
      */
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP", justification = "Intentional")
     @Override
     public GameTurnManager getGameTurnManager() {
         return gameTurnManager;

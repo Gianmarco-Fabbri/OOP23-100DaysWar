@@ -10,11 +10,12 @@
 
 <p align="center">
   <a href="https://github.com/Gianmarco-Fabbri/OOP23-100DaysWar/blob/main/LICENSE"><img src="https://img.shields.io/github/license/Gianmarco-Fabbri/OOP23-100DaysWar?style=for-the-badge&color=blue" alt="License"></a>
-  <a href="https://www.java.com/"><img src="https://img.shields.io/badge/Java-17+-orange?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java 17+"></a>
-  <a href="https://gradle.org/"><img src="https://img.shields.io/badge/Gradle-Build-02303A?style=for-the-badge&logo=gradle&logoColor=white" alt="Gradle"></a>
-  <a href="https://github.com/Gianmarco-Fabbri/OOP23-100DaysWar/releases"><img src="https://img.shields.io/github/v/release/Gianmarco-Fabbri/OOP23-100DaysWar?style=for-the-badge&color=green" alt="Release"></a>
-  <a href="https://github.com/Gianmarco-Fabbri/OOP23-100DaysWar"><img src="https://img.shields.io/github/stars/Gianmarco-Fabbri/OOP23-100DaysWar?style=for-the-badge&color=yellow" alt="Stars"></a>
-  <a href="https://github.com/Gianmarco-Fabbri/OOP23-100DaysWar/issues"><img src="https://img.shields.io/github/issues/Gianmarco-Fabbri/OOP23-100DaysWar?style=for-the-badge" alt="Issues"></a>
+  <a href="https://github.com/Gianmarco-Fabbri/OOP23-100DaysWar/actions/workflows/ci.yml"><img src="https://github.com/Gianmarco-Fabbri/OOP23-100DaysWar/actions/workflows/ci.yml/badge.svg" alt="Build and tests"></a>
+  <img src="https://img.shields.io/badge/Java-21-orange?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java 21">
+</p>
+
+<p align="center">
+  <img src="docs/images/gameplay.png" alt="100 Days War gameplay: procedurally generated map, player statistics, shop and controls" width="900"/>
 </p>
 
 ---
@@ -25,6 +26,11 @@
 
 > **University Project** — Developed as part of the *Object-Oriented Programming* course (A.Y. 2023/2024) at the [University of Bologna](https://www.unibo.it/).
 > **Bachelor Degree in [Computer Science and Engineering](https://corsi.unibo.it/laurea/IngegneriaScienzeInformatiche)**.
+
+My contributions were the soldier interactions, AI opponent and live statistics. The other game systems were built with three teammates; individual responsibilities are listed in the Team & Contributions section below.
+
+The full design and user manual are in the [technical report](Report.pdf).
+
 ---
 
 ## 🎮 How It Works
@@ -115,8 +121,8 @@ graph TB
 
 ### Prerequisites
 
-- **Java 17** or higher
-- **Gradle** (wrapper included)
+- **Java 21 JDK** for building; Java 21 runtime to run the generated JAR
+- No separate Gradle installation is needed: the wrapper is included
 
 ### Run from Source
 
@@ -129,24 +135,20 @@ cd OOP23-100DaysWar
 ./gradlew run
 ```
 
-### Run the Pre-Built JAR
+On Windows, use `gradlew.bat run`.
 
-```bash
-java -jar OOP23-100DaysWar-all.jar
-```
-
-### Build a Fat JAR
+### Build and Run a JAR
 
 ```bash
 ./gradlew shadowJar
-# Output: build/libs/OOP23-100DaysWar-all.jar
+java -jar build/libs/OOP23-100DaysWar-all.jar
 ```
 
 ---
 
 ## 🧪 Testing
 
-The project includes **19 test classes** powered by JUnit 5.
+The project includes automated tests powered by JUnit 5.
 
 ```bash
 ./gradlew test

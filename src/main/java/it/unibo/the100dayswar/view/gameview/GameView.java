@@ -1,21 +1,15 @@
 package it.unibo.the100dayswar.view.gameview;
 
-import javax.imageio.ImageIO;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-
-
 import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Image;
 import java.awt.Insets;
-import java.io.IOException;
-import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
+import it.unibo.the100dayswar.controller.maincontroller.api.MainController;
+import it.unibo.the100dayswar.view.backgroundpanel.BackgroundPanel;
 import it.unibo.the100dayswar.view.joystick.JoystickView;
 import it.unibo.the100dayswar.view.map.MapView;
 import it.unibo.the100dayswar.view.statistics.StatisticsView;
@@ -36,21 +30,26 @@ public class GameView extends JFrame {
     private static final int TOP_BOTTOM_PADDING = 5;
     private static final double JOYSTICK_WEIGHT_Y = 0.7;
     private static final int SIDE_PADDING = 10;
-    private static final Logger LOGGER = Logger.getLogger(GameView.class.getName());
+
+    private final transient MainController mainController;
 
     /**
      * Constructor for the GameView class.
+     * @param mainController the main controller
      */
-    public GameView() {
+    public GameView(final MainController mainController) {
         super("Game View");
+        this.mainController = mainController;
     }
 
     /**
      * Initializes the frame, setting up the UI and final configuration.
      */
     public final void initialize() {
-        setUI();
-        setPostInitialize();
+        SwingUtilities.invokeLater(() -> {
+            setUI();
+            setPostInitialize();
+        });
     }
 
     /**
@@ -67,26 +66,14 @@ public class GameView extends JFrame {
      * Sets up the main user interface, including the background and layout.
      */
     private void setUI() {
-        final JPanel backgroundPanel = new JPanel() {
-            private static final long serialVersionUID = 1L;
-            private final Image backgroundImage = loadBackgroundImage();
-
-            @Override
-            protected void paintComponent(final Graphics g) {
-                super.paintComponent(g);
-                if (backgroundImage != null) {
-                    g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
-                }
-            }
-        };
-
+        final JPanel backgroundPanel = new BackgroundPanel("/gameview/background.jpg");
         backgroundPanel.setLayout(new GridBagLayout());
         this.setContentPane(backgroundPanel);
 
-        final MapView mapView = new MapView();
-        final StatisticsView statisticsView = new StatisticsView();
+        final MapView mapView = new MapView(mainController);
+        final StatisticsView statisticsView = new StatisticsView(mainController);
         statisticsView.initialize();
-        final JoystickView joystickView = new JoystickView(mapView, statisticsView);
+        final JoystickView joystickView = new JoystickView(mainController);
 
         mapView.setOpaque(false);
         statisticsView.setOpaque(false);
@@ -128,23 +115,6 @@ public class GameView extends JFrame {
         backgroundPanel.repaint();
     }
 
-    /**
-     * Loads the background image from the specified path.
-     *
-     * @return the loaded image, or null if loading fails.
-     */
-    private Image loadBackgroundImage() {
-        try {
-            final String path = "/gameview/background.jpg";
-            final URL imageUrl = GameView.class.getResource(path);
-            if (imageUrl == null) {
-                LOGGER.log(Level.WARNING, "Background image not found at path: " + path);
-                return null;
-            }
-            return ImageIO.read(imageUrl);
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Error loading background image", e);
-            return null;
-        }
-    }
+    // Removed loadBackgroundImage()
+
 }

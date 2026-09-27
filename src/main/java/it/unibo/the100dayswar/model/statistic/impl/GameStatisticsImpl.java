@@ -61,9 +61,9 @@ public class GameStatisticsImpl implements GameStatistics {
      * Updates the percentage of cells owned for each player.
      */
     private void updateCellsPercentage() {
-        final long totalCellsPercentage = mapManager.getMapAsAStream().count() / 100;
+        final double totalCellsPercentage = mapManager.getMapAsAStream().count() / 100.0;
         mapManager.getPlayersCells().forEach((player, cells) -> 
-            cellsPercentage.put(player, (double) cells.size() / totalCellsPercentage)
+            cellsPercentage.put(player, cells.size() / totalCellsPercentage)
         );
     }
 

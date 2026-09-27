@@ -14,8 +14,17 @@ public class BattleSoldierTowerImpl implements BattleSoldierTower {
      * start a fight between a soldier and a tower.
      */
     @Override
-    public void startFight(final Soldier attacker, final Tower defender) {
-        final int damage = DEFAULT_DAMAGE * attacker.getLevel();
-        defender.takeDamage(damage);
+    public boolean startFight(final Soldier attacker, final Tower defender) {
+        if (calculateDistance(attacker, defender)) {
+            final int damage = DEFAULT_DAMAGE * attacker.getLevel();
+            defender.takeDamage(damage);
+        }
+        return true;
+    }
+
+    private boolean calculateDistance(final Soldier soldier, final Tower tower) {
+        final int distanceX = Math.abs(tower.getPosition().getPosition().getX() - soldier.getPosition().getPosition().getX());
+        final int distanceY = Math.abs(tower.getPosition().getPosition().getY() - soldier.getPosition().getPosition().getY());
+        return distanceX <= 1 && distanceY <= 1;
     }
 }

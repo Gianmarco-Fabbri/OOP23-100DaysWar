@@ -4,8 +4,7 @@ import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
 import it.unibo.the100dayswar.commons.utilities.impl.LoadPixelFont;
-import it.unibo.the100dayswar.view.map.MapView;
-import it.unibo.the100dayswar.view.statistics.StatisticsView;
+import it.unibo.the100dayswar.controller.maincontroller.api.MainController;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -33,21 +32,21 @@ public class JoystickView extends JPanel {
     private final ShopView shopView;
     private final MovementView movementView;
     private final ControlView controlView;
+    private final transient BufferedImage backgroundImage;
 
     /**
      * Constructor for the JoystickView class.
      * 
-     * @param mapView the map view to repaint
-     * @param statisticView the statistics view to update
+     * @param mainController the main controller
      */
-    public JoystickView(final MapView mapView, final StatisticsView statisticView) {
-        loadBackgroundImage();
+    public JoystickView(final MainController mainController) {
+        this.backgroundImage = loadBackgroundImage();
         super.setLayout(new GridBagLayout());
         final GridBagConstraints gbc = new GridBagConstraints();
 
-        this.movementView = new MovementView(mapView, statisticView);
-        this.shopView = new ShopView(mapView, statisticView);
-        this.controlView = new ControlView(mapView, statisticView);
+        this.movementView = new MovementView(mainController);
+        this.shopView = new ShopView(mainController);
+        this.controlView = new ControlView(mainController);
 
         customizePanel(this.movementView, "Movement");
         customizePanel(this.shopView, "Shop");
@@ -108,11 +107,11 @@ public class JoystickView extends JPanel {
     @Override
     protected void paintComponent(final Graphics g) {
         super.paintComponent(g);
-    if (loadBackgroundImage() != null) {
-        final Graphics2D g2d = (Graphics2D) g.create();
-        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, BACKGROUND_OPACITY));
-        g2d.drawImage(loadBackgroundImage(), 0, 0, getWidth(), getHeight(), this);
-        g2d.dispose();
-    }
+        if (backgroundImage != null) {
+            final Graphics2D g2d = (Graphics2D) g.create();
+            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, BACKGROUND_OPACITY));
+            g2d.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+            g2d.dispose();
+        }
     }
 }

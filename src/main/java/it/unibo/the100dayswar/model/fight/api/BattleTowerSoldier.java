@@ -14,5 +14,5 @@ public interface BattleTowerSoldier extends Battle<Tower, Soldier> {
      * @param defender soldier that defend
      */
     @Override
-    void startFight(Tower attacker, Soldier defender);
+    boolean startFight(Tower attacker, Soldier defender);
 }

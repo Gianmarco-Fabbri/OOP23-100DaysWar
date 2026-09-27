@@ -1,16 +1,18 @@
 package it.unibo.the100dayswar.view.statistics;
 
-import it.unibo.the100dayswar.application.The100DaysWar;
+import it.unibo.the100dayswar.controller.maincontroller.api.MainController;
 import it.unibo.the100dayswar.commons.utilities.impl.LoadPixelFont;
 import it.unibo.the100dayswar.model.player.api.Player;
 
-import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
+import it.unibo.the100dayswar.view.backgroundpanel.BackgroundPanel;
+import it.unibo.the100dayswar.controller.events.GameUpdateEvent;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -18,17 +20,17 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * The view that displays the statistics of the players.
  */
+@SuppressFBWarnings("RV_RETURN_VALUE_IGNORED")
 public class StatisticsView extends JPanel {
     private static final long serialVersionUID = 1L;
     private static final int BORDER_THICKNESS = 5;
@@ -41,11 +43,14 @@ public class StatisticsView extends JPanel {
     private final DecimalFormat df;
     private final Map<Player, Map<String, JLabel>> playerLabels = new HashMap<>();
     private final JLabel dayLabel;
+    private final transient MainController mainController;
 
     /**
      * Constructor of the statistics view.
+     * @param mainController the main controller
      */
-    public StatisticsView() {
+    public StatisticsView(final MainController mainController) {
+        this.mainController = mainController;
         df = new DecimalFormat("#.##");
 
         this.dayLabel = new JLabel("", JLabel.CENTER);
@@ -57,9 +62,14 @@ public class StatisticsView extends JPanel {
      * Inizializza la view dopo la costruzione dell'oggetto.
      */
     public void initialize() {
-        postInitializeView();
-        addDayLabel();
-        initializeView();
+        SwingUtilities.invokeLater(() -> {
+            postInitializeView();
+            addDayLabel();
+            initializeView();
+        });
+
+        mainController.getEventBus().on(GameUpdateEvent.class)
+                .subscribe(event -> SwingUtilities.invokeLater(this::updateStatisticView));
     }
 
     /**
@@ -82,7 +92,7 @@ public class StatisticsView extends JPanel {
      * Inizializza i pannelli delle statistiche per ogni giocatore.
      */
     private void initializeView() {
-        final List<Player> players = The100DaysWar.CONTROLLER.getStatisticController().getPlayers();
+        final List<Player> players = mainController.getStatisticController().getPlayers();
 
         players.forEach(player -> {
             add(createPlayerStatisticsPanel(player));
@@ -97,28 +107,15 @@ public class StatisticsView extends JPanel {
      * @return a JPanel containing the player's statistics.
      */
     private JPanel createPlayerStatisticsPanel(final Player player) {
-        final JPanel panel = new JPanel() {
+        final JPanel panel = new BackgroundPanel("/statistic/statistics_background.png") {
             private static final long serialVersionUID = 1L;
-            private BufferedImage backgroundImage;
-
-            {
-                try {
-                    backgroundImage = ImageIO.read(getClass().getResource("/statistic/statistics_background.png"));
-                } catch (IOException e) {
-                    Logger.getLogger(getClass().getName())
-                          .log(java.util.logging.Level.SEVERE, e.getMessage());
-                }
-            }
 
             @Override
             protected void paintComponent(final Graphics g) {
-                super.paintComponent(g);
-                if (backgroundImage != null) {
-                    final Graphics2D g2d = (Graphics2D) g.create();
-                    g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
-                    g2d.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
-                    g2d.dispose();
-                }
+                final Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+                super.paintComponent(g2d);
+                g2d.dispose();
             }
         };
 
@@ -133,13 +130,13 @@ public class StatisticsView extends JPanel {
 
         final Map<String, JLabel> labels = new HashMap<>();
         labels.put("Soldiers", createLabel("Soldiers: "
-            + The100DaysWar.CONTROLLER.getStatisticController().getSoldiers(player)));
+            + mainController.getStatisticController().getSoldiers(player)));
         labels.put("Towers", createLabel("Towers: "
-            + The100DaysWar.CONTROLLER.getStatisticController().getTowers(player)));
+            + mainController.getStatisticController().getTowers(player)));
         labels.put("CellsOwned", createLabel("Cells Owned(%): "
-            + The100DaysWar.CONTROLLER.getStatisticController().getCellsPercentage(player)));
+            + mainController.getStatisticController().getCellsPercentage(player)));
         labels.put("Balance", createLabel("Balance: "
-            + The100DaysWar.CONTROLLER.getStatisticController().getBalance(player)));
+            + mainController.getStatisticController().getBalance(player)));
 
         labels.values().forEach(panel::add);
         playerLabels.put(player, labels);
@@ -162,7 +159,7 @@ public class StatisticsView extends JPanel {
      * Aggiorna il testo della dayLabel con il giorno corrente.
      */
     private void updateDayLabel() {
-        final int currentDay = The100DaysWar.CONTROLLER.getGameInstance().getGameDay();
+        final int currentDay = mainController.getGameInstance().getGameDay();
         this.dayLabel.setText("Day: " + currentDay);
     }
 
@@ -172,16 +169,16 @@ public class StatisticsView extends JPanel {
     public void updateStatisticView() {
         updateDayLabel();
 
-        The100DaysWar.CONTROLLER.getStatisticController().updateStatistics();
+        mainController.getStatisticController().updateStatistics();
         playerLabels.forEach((player, labels) -> {
             labels.get("Soldiers").setText("Soldiers: "
-                + The100DaysWar.CONTROLLER.getStatisticController().getSoldiers(player));
+                + mainController.getStatisticController().getSoldiers(player));
             labels.get("Towers").setText("Towers: "
-                + The100DaysWar.CONTROLLER.getStatisticController().getTowers(player));
+                + mainController.getStatisticController().getTowers(player));
             labels.get("CellsOwned").setText("Cells Owned(%): "
-                + df.format(The100DaysWar.CONTROLLER.getStatisticController().getCellsPercentage(player)));
+                + df.format(mainController.getStatisticController().getCellsPercentage(player)));
             labels.get("Balance").setText("Balance: "
-                + The100DaysWar.CONTROLLER.getStatisticController().getBalance(player));
+                + mainController.getStatisticController().getBalance(player));
         });
         repaint();
     }

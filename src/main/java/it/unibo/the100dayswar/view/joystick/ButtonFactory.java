@@ -66,8 +66,8 @@ public final class ButtonFactory {
      */
     private static Icon loadIcon(final String iconPath, final Dimension size) {
         final Icon loadedIcon = IconLoader.loadIcon(iconPath);
-        if (loadedIcon instanceof ImageIcon) {
-            final Image scaledImage = ((ImageIcon) loadedIcon).getImage()
+        if (loadedIcon instanceof ImageIcon imageIcon && imageIcon.getImage() != null) {
+            final Image scaledImage = imageIcon.getImage()
                 .getScaledInstance(size.width, size.height, Image.SCALE_SMOOTH);
             return new ImageIcon(scaledImage);
         }

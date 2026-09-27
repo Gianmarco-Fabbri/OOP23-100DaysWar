@@ -63,4 +63,17 @@ public interface GameTurnManager extends Observer<Pair<Player, Unit>>, Serializa
      */
     @Override
     void update(Pair<Player, Unit> source);
+
+    /**
+     * Set the update callback.
+     *
+     * @param callback the callback
+     */
+    void setUpdateCallback(Runnable callback);
+    /**
+     * Set the tower shot callback.
+     *
+     * @param callback the callback
+     */
+    void setTowerShotCallback(java.util.function.Consumer<Pair<Integer, Integer>> callback);
 }

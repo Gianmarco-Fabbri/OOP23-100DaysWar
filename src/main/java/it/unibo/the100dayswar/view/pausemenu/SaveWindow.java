@@ -3,7 +3,10 @@ package it.unibo.the100dayswar.view.pausemenu;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
-import it.unibo.the100dayswar.application.The100DaysWar;
+import javax.swing.SwingUtilities;
+import java.util.function.Consumer;
+
+import it.unibo.the100dayswar.controller.maincontroller.api.MainController;
 
 /**
  * Utility class that implements the dialog to save or not save
@@ -22,10 +25,13 @@ public final class SaveWindow {
      * 
      * @param parent the JDialog that launch this window
      * @param savingPath the location of the saving file
-     * 
-     * @return true if the game is saved false otherwise
+     * @param mainController the main controller
+     * @param callback the callback to be called with true if saved, false otherwise
      */
-    public static boolean saveDialog(final JDialog parent, final String savingPath) {
+    public static void saveDialog(final JDialog parent,
+                                  final String savingPath,
+                                  final MainController mainController,
+                                  final Consumer<Boolean> callback) {
         final int save = JOptionPane.showConfirmDialog(
             parent,
             "Do you want to save the game?",
@@ -34,27 +40,29 @@ public final class SaveWindow {
         );
 
         if (save == JOptionPane.YES_OPTION) {
-            if (The100DaysWar.CONTROLLER.saveGame(savingPath)) {
-                JOptionPane.showMessageDialog(
-                    parent,
-                    "Game saved successfully!",
-                    "Save Status",
-                    JOptionPane.INFORMATION_MESSAGE
-                );
-                return true;
-
-            } else {
-                JOptionPane.showMessageDialog(
-                    parent,
-                    "Failed to save the game. Please try again.",
-                    "Save Status",
-                    JOptionPane.ERROR_MESSAGE
-                );
-                return false;
-
-            }
+            mainController.saveGame(savingPath).thenAccept(success -> {
+                SwingUtilities.invokeLater(() -> {
+                    if (success) {
+                        JOptionPane.showMessageDialog(
+                            parent,
+                            "Game saved successfully!",
+                            "Save Status",
+                            JOptionPane.INFORMATION_MESSAGE
+                        );
+                        callback.accept(true);
+                    } else {
+                        JOptionPane.showMessageDialog(
+                            parent,
+                            "Failed to save the game. Please try again.",
+                            "Save Status",
+                            JOptionPane.ERROR_MESSAGE
+                        );
+                        callback.accept(false);
+                    }
+                });
+            });
+        } else {
+            callback.accept(false);
         }
-
-        return false;
     }
 }

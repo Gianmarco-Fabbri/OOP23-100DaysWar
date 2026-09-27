@@ -163,4 +163,17 @@ public interface Model {
      * @return the current game day
      */
     int getGameDay();
+
+    /**
+     * Set the update callback.
+     *
+     * @param callback the callback
+     */
+    void setUpdateCallback(Runnable callback);
+    /**
+     * Set the tower shot callback.
+     *
+     * @param callback the callback
+     */
+    void setTowerShotCallback(java.util.function.Consumer<Pair<Integer, Integer>> callback);
 }

@@ -63,28 +63,32 @@ public interface MainController {
     void startNewGame(String username);
 
     /**
-     * Save the current game.
+     * Save the current game asynchronously.
      * 
      * @param path the path of the saving_file
-     * @return true if the game was saved correctly
-     *         false otherwise
+     * @return a CompletableFuture representing the asynchronous operation
      * 
      * @implNote if the path is null the game will be 
      * saved in the default path.
      */
-    boolean saveGame(String path);
+    java.util.concurrent.CompletableFuture<Boolean> saveGame(String path);
 
     /**
-     * Load a previous game initializing the model as the 
+     * Load a previous game asynchronously initializing the model as the
      * one saved in the saving_file.
      * 
      * @param path the path of the saving file
      * 
-     * @return true if the old game is loaded correctly
-     *         false otherwise
+     * @return a CompletableFuture representing the asynchronous operation
      * 
      * @implNote if the path is null the old game will be 
      * laoded following the default path.
      */
-    boolean loadOldGame(String path);
+    java.util.concurrent.CompletableFuture<Boolean> loadOldGame(String path);
+
+    /**
+     * Returns the event bus for messaging.
+     * @return the event bus
+     */
+    it.unibo.the100dayswar.controller.events.EventBus getEventBus();
 }

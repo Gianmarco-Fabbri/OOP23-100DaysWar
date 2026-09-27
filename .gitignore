@@ -1,17 +1,35 @@
-# Ignore Gradle project-specific cache directory
-.gradle
-
-# Ignore Gradle build output directory
-build/
+# Gradle and compiled output
+.gradle/
+**/build/
 bin/
+out/
+*.class
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
 
-# Ignore Idea customizations
-.idea
-
-# Ignore Eclipse settings
-.project
+# Local IDE settings
+.idea/
+*.iml
+.vscode/
 .settings/
+.project
 .classpath
+.factorypath
 
-# Ignore macOS system files
+# Local game saves and logs
+*.ser
+*.sav
+*.log
+/.env
+/.env.*
+!/.env.example
+/refactor.py
+
+# Operating system and editor files
 .DS_Store
+Thumbs.db
+Desktop.ini
+*~
+*.swp
+*.orig
+*.rej

@@ -1,23 +1,18 @@
 package it.unibo.the100dayswar.view.gameover;
 
-import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import it.unibo.the100dayswar.view.backgroundpanel.BackgroundPanel;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Window;
-import java.io.IOException;
-import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import it.unibo.the100dayswar.application.The100DaysWar;
+import it.unibo.the100dayswar.controller.maincontroller.api.MainController;
 import it.unibo.the100dayswar.commons.utilities.impl.LoadPixelFont;
 
 /**
@@ -26,12 +21,12 @@ import it.unibo.the100dayswar.commons.utilities.impl.LoadPixelFont;
 public abstract class AbstractGameOverView extends JFrame {
 
     private static final long serialVersionUID = 1L;
-    private static final Logger LOGGER = Logger.getLogger(AbstractGameOverView.class.getName());
     private static final int FRAME_WIDTH = 800;
     private static final int FRAME_HEIGHT = 600;
     private static final int MARGIN = 20;
     private final String messageText;
     private final String backgroundImgPath;
+    private final transient MainController mainController;
 
 
     /**
@@ -39,19 +34,23 @@ public abstract class AbstractGameOverView extends JFrame {
      * 
      * @param messageText the message to display
      * @param backgroundImgPath the path to the background image
+     * @param mainController the main controller
      */
-    public AbstractGameOverView(final String messageText, final String backgroundImgPath) {
+    public AbstractGameOverView(final String messageText, final String backgroundImgPath, final MainController mainController) {
         super("Game Over");
         this.messageText = messageText;
         this.backgroundImgPath = backgroundImgPath;
+        this.mainController = mainController;
     }
 
     /**
      * Initializes the game over view.
      */
     public final void initialize() {
-        setUI(messageText, backgroundImgPath);
-        setPostInitialize();
+        SwingUtilities.invokeLater(() -> {
+            setUI(messageText, backgroundImgPath);
+            setPostInitialize();
+        });
     }
 
     /**
@@ -61,19 +60,7 @@ public abstract class AbstractGameOverView extends JFrame {
      * @param backgroundImgPath  the path to the background image
      */
     private void setUI(final String messageText, final String backgroundImgPath) {
-        final JPanel backgroundPanel = new JPanel() {
-            private static final long serialVersionUID = 1L;
-            private final Image backgroundImage = loadBackgroundImage(backgroundImgPath);
-
-            @Override
-            protected void paintComponent(final Graphics g) {
-                super.paintComponent(g);
-                if (backgroundImage != null) {
-                    g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
-                }
-            }
-        };
-
+        final JPanel backgroundPanel = new BackgroundPanel(backgroundImgPath);
         backgroundPanel.setLayout(new BorderLayout());
         this.setContentPane(backgroundPanel);
 
@@ -129,31 +116,14 @@ public abstract class AbstractGameOverView extends JFrame {
         mainMenuButton.setMargin(new Insets(10, MARGIN, 10, MARGIN));
         mainMenuButton.addActionListener(e -> {
             closeAllWindows();
-            The100DaysWar.CONTROLLER.startGame();
+            mainController.startGame();
             dispose();
         });
         return mainMenuButton;
     }
 
-    /**
-     * Loads the background image from the specified path.
-     *
-     * @param path the path to the background image
-     * @return the loaded image, or null if loading fails
-     */
-    private Image loadBackgroundImage(final String path) {
-        try {
-            final URL imageUrl = AbstractGameOverView.class.getResource(path);
-            if (imageUrl == null) {
-                LOGGER.log(Level.WARNING, "Background image not found at path: {0}", path);
-                return null;
-            }
-            return ImageIO.read(imageUrl);
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Error loading background image", e);
-            return null;
-        }
-    }
+    // Removed loadBackgroundImage()
+
 
     /**
      * Closes all visible windows.

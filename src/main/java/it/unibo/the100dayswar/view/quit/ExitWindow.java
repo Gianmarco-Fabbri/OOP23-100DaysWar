@@ -17,7 +17,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import it.unibo.the100dayswar.application.The100DaysWar;
+import it.unibo.the100dayswar.controller.maincontroller.api.MainController;
 import it.unibo.the100dayswar.commons.utilities.impl.IconLoader;
 import it.unibo.the100dayswar.commons.utilities.impl.LoadPixelFont;
 
@@ -41,13 +41,17 @@ public final class ExitWindow extends JDialog {
     private static final int BUTTON_WIDTH = 70;
     private static final int BUTTON_HEIGHT = 50;
 
+    private final transient MainController mainController;
+
     /**
      * Created a custom exit window.
      * 
      * @param parent the parent JFrame.
+     * @param mainController the main controller.
      */
-    private ExitWindow(final JFrame parent) {
+    private ExitWindow(final JFrame parent, final MainController mainController) {
         super(parent, "Exit Confirmation", true);
+        this.mainController = mainController;
         final ImageIcon backgroundImage = (ImageIcon) IconLoader.loadIcon(BACKGROUND_PATH);
 
         final JPanel backgroundPanel = createBackgroundPanel(backgroundImage);
@@ -65,9 +69,10 @@ public final class ExitWindow extends JDialog {
      * Utility method to show the dialog.
      * 
      * @param parent the parent JFrame
+     * @param mainController the main controller
      */
-    public static void showDialog(final JFrame parent) {
-        new ExitWindow(parent).setVisible(true);
+    public static void showDialog(final JFrame parent, final MainController mainController) {
+        new ExitWindow(parent, mainController).setVisible(true);
     }
 
     /**
@@ -164,7 +169,7 @@ public final class ExitWindow extends JDialog {
      * Terminates all the threads that are running.
      */
     private void terminateThreads() {
-        The100DaysWar.CONTROLLER.getGameInstance().stopTimer();
+        mainController.getGameInstance().stopTimer();
     }
 
     /**

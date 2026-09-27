@@ -126,4 +126,11 @@ public interface Player extends Observer<ResourceGenerator>, Serializable {
      */
     @Override
     void update(ResourceGenerator generator);
+
+    /**
+     * Returns a copy of the player.
+     *
+     * @return a copy of the player
+     */
+    Player copy();
 }

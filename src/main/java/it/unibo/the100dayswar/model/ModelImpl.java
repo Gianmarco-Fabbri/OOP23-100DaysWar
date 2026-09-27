@@ -65,6 +65,8 @@ public class ModelImpl implements Model {
         this.players = List.of(new SimpleBot(mapManager), new HumanPlayerImpl(namePlayer, mapManager.getPlayerSpawn()));
         this.turnManager = new GameTurnManagerImpl(players);
         this.mapManager.attach(turnManager);
+        // Inject the GameMap into the TurnManager for tower LOS checking
+        ((GameTurnManagerImpl) this.turnManager).setGameMap(buildGameMap());
         this.gameStatistics = new GameStatisticsImpl(players, mapManager);
         gameStatistics.updateAllStatistics();
         this.turnManager.startTimer();
@@ -78,13 +80,13 @@ public class ModelImpl implements Model {
      */
     public ModelImpl(final Optional<String> path) {
         final GameLoader loader = path.isPresent() ? new GameLoaderImpl(path.get()) : new GameLoaderImpl();
-        final Optional<GameData> data = loader.loadGame();
-        if (data.isEmpty()) {
-            Logger.getLogger(ModelImpl.class.getName()).warning("The data are not loaded correctly");
-        }
-        this.mapManager = new MapManagerImpl(data.get().getMapManager());
-        this.turnManager = data.get().getGameTurnManager();
-        this.players = List.of(new SimpleBot(data.get().getBotData()), data.get().getHumanData());
+        final GameData data = loader.loadGame()
+            .orElseThrow(() -> new IllegalStateException("The saved game could not be loaded"));
+        this.mapManager = new MapManagerImpl(data.getMapManager());
+        this.turnManager = data.getGameTurnManager();
+        // Inject the GameMap into the TurnManager for tower LOS checking
+        ((GameTurnManagerImpl) this.turnManager).setGameMap(buildGameMap());
+        this.players = List.of(new SimpleBot(data.getBotData()), data.getHumanData());
         this.gameStatistics = new GameStatisticsImpl(players, mapManager);
     }
 
@@ -133,8 +135,8 @@ public class ModelImpl implements Model {
      */
     @Override
     public HumanPlayer getHumanPlayer() {
-        if (players.size() > HUMAN_PLAYER && players.get(HUMAN_PLAYER) instanceof HumanPlayer) {
-            return (HumanPlayer) players.get(HUMAN_PLAYER);
+        if (players.size() > HUMAN_PLAYER && players.get(HUMAN_PLAYER) instanceof HumanPlayer hp) {
+            return hp;
         } else {
             Logger.getLogger(ModelImpl.class.getName()).info("The human player has not been added yet");
             return null;
@@ -146,8 +148,8 @@ public class ModelImpl implements Model {
      */
     @Override
     public BotPlayer getBotPlayer() {
-        if (!players.isEmpty() && players.get(BOT_PLAYER) instanceof BotPlayer) {
-            return (BotPlayer) players.get(BOT_PLAYER);
+        if (!players.isEmpty() && players.get(BOT_PLAYER) instanceof BotPlayer bp) {
+            return bp;
         } else {
             Logger.getLogger(ModelImpl.class.getName()).info("The bot player has not been added yet");
             return null;
@@ -270,12 +272,24 @@ public class ModelImpl implements Model {
      */
     @Override
     public GameMap getMap() {
+        return buildGameMap();
+    }
+
+    /**
+     * Private helper to build a {@link GameMap} snapshot from the current map manager.
+     * Used in constructors to avoid calling the overridable {@link #getMap()} method.
+     *
+     * @return a fresh {@link GameMap} snapshot
+     */
+    private GameMap buildGameMap() {
         return new GameMapImpl(
-            (int) mapManager.getMapDimension().getWidth(), 
+            (int) mapManager.getMapDimension().getWidth(),
             (int) mapManager.getMapDimension().getHeight(),
-            MapManager.createMapFromStream((int) getMapWidth(),
-            (int) getMapHeight(), mapManager.getMapAsAStream())
-            );
+            MapManager.createMapFromStream(
+                (int) mapManager.getMapDimension().getWidth(),
+                (int) mapManager.getMapDimension().getHeight(),
+                mapManager.getMapAsAStream())
+        );
     }
 
     /**
@@ -335,5 +349,20 @@ public class ModelImpl implements Model {
     @Override
     public int getGameDay() {
         return turnManager.getDay();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setUpdateCallback(final Runnable callback) {
+        if (this.turnManager != null) {
+            this.turnManager.setUpdateCallback(callback);
+        }
+    }
+
+    @Override
+    public final void setTowerShotCallback(final java.util.function.Consumer<Pair<Integer, Integer>> callback) {
+        ((GameTurnManagerImpl) this.turnManager).setTowerShotCallback(callback);
     }
 }

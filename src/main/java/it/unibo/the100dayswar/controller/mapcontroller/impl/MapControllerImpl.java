@@ -1,11 +1,11 @@
 package it.unibo.the100dayswar.controller.mapcontroller.impl;
 
 import it.unibo.the100dayswar.view.map.CellView;
-import it.unibo.the100dayswar.application.The100DaysWar;
 import it.unibo.the100dayswar.commons.utilities.api.Position;
 import it.unibo.the100dayswar.commons.utilities.impl.Pair;
 import it.unibo.the100dayswar.commons.utilities.impl.PositionImpl;
 import it.unibo.the100dayswar.controller.mapcontroller.api.MapController;
+import it.unibo.the100dayswar.controller.maincontroller.api.MainController;
 import it.unibo.the100dayswar.model.bot.api.BotPlayer;
 import it.unibo.the100dayswar.model.cell.api.Cell;
 import it.unibo.the100dayswar.model.map.api.GameMap;
@@ -30,11 +30,14 @@ public class MapControllerImpl implements MapController {
     private static final String OBSTACLE_PATH = "/map/obstacle.png";
 
     private Pair<Unit, Cell> selectedCell;
+    private final MainController mainController;
     /**
      * Constructor for the MapControllerImpl.
+     * @param mainController the main controller
      */
-    public MapControllerImpl() {
+    public MapControllerImpl(final MainController mainController) {
         this.selectedCell = new Pair<>(null, null);
+        this.mainController = mainController;
     }
 
     /**
@@ -42,7 +45,7 @@ public class MapControllerImpl implements MapController {
      */
     @Override
     public int getMapWidth() {
-        return (int) The100DaysWar.CONTROLLER.getGameInstance().getMap().getSize().getWidth();
+        return (int) mainController.getGameInstance().getMap().getSize().getWidth();
     }
 
     /**
@@ -50,7 +53,7 @@ public class MapControllerImpl implements MapController {
      */
     @Override
     public int getMapHeight() {
-        return (int) The100DaysWar.CONTROLLER.getGameInstance().getMap().getSize().getHeight();
+        return (int) mainController.getGameInstance().getMap().getSize().getHeight();
     }
 
     /**
@@ -59,7 +62,7 @@ public class MapControllerImpl implements MapController {
     @Override
     public List<CellView> getCellsView() {
         final List<CellView> cellDataList = new ArrayList<>();
-        The100DaysWar.CONTROLLER.getGameInstance().getMap().getAllCells().forEach(cell -> {
+        mainController.getGameInstance().getMap().getAllCells().forEach(cell -> {
             String imagePath = "";
 
             if (cell.isSpawn()) {
@@ -100,7 +103,7 @@ public class MapControllerImpl implements MapController {
      */
     @Override
     public GameMap getMap() {
-        return The100DaysWar.CONTROLLER.getGameInstance().getMap();
+        return mainController.getGameInstance().getMap();
     }
 
     /**
@@ -108,7 +111,7 @@ public class MapControllerImpl implements MapController {
      */
     @Override
     public void onCellClick(final int cellX, final int cellY) {
-         final GameMap map = The100DaysWar.CONTROLLER.getGameInstance().getMap();
+         final GameMap map = mainController.getGameInstance().getMap();
          final Cell clickedCell = map.getCell(new PositionImpl(cellX, cellY));
          selectedCell = new Pair<>(clickedCell.getUnit().orElse(null), clickedCell);
     }
@@ -118,9 +121,23 @@ public class MapControllerImpl implements MapController {
      */
     @Override
     public Pair<Unit, Cell> getSelectedCell() {
-        final var copySelectedCell = new Pair<>(selectedCell.getFirst(), selectedCell.getSecond());
+        return new Pair<>(selectedCell.getFirst(), selectedCell.getSecond());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clearSelectedCell() {
         this.selectedCell = new Pair<>(null, null);
-        return copySelectedCell;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setSelectedCell(final Cell cell) {
+        this.selectedCell = new Pair<>(cell.getUnit().orElse(null), cell);
     }
 
     /**

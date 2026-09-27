@@ -1,15 +1,12 @@
 package it.unibo.the100dayswar.controller.maincontroller.impl;
 
 import java.util.Optional;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.concurrent.CompletableFuture;
+import javax.swing.SwingUtilities;
+
+import it.unibo.the100dayswar.controller.events.EventBus;
+import it.unibo.the100dayswar.controller.events.GameUpdateEvent;
+import it.unibo.the100dayswar.controller.events.BattleResultEvent;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import it.unibo.the100dayswar.controller.gamecontroller.api.GameController;
@@ -32,9 +29,6 @@ import it.unibo.the100dayswar.view.startmenu.StartMenuView;
  * The implementation of the main controller of the game.
  */
 public class MainControllerImpl implements MainController {
-    private static final Logger LOGGER = Logger.getLogger(MainController.class.getName());
-    private static final int TIMEOUT = 30;
-
     private final StatisticController statisticController;
     private final ShopController shopController;
     private final MovementController movementController;
@@ -42,16 +36,27 @@ public class MainControllerImpl implements MainController {
     private final GameController gameController;
     private Model model;
 
+    private final EventBus eventBus;
+
     /**
      * Constructor of the main controller.
      */
     public MainControllerImpl() {
-        this.statisticController = new StatisticControllerImpl();
-        this.shopController = new ShopControllerImpl();
-        this.mapController = new MapControllerImpl();
-        this.gameController = new GameControllerImpl();
-        this.movementController = new MovementControllerImpl();
+        this.eventBus = new EventBus();
+        this.statisticController = new StatisticControllerImpl(this);
+        this.shopController = new ShopControllerImpl(this);
+        this.mapController = new MapControllerImpl(this);
+        this.gameController = new GameControllerImpl(this);
+        this.movementController = new MovementControllerImpl(this);
         this.model = null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public EventBus getEventBus() {
+        return this.eventBus;
     }
 
     /** 
@@ -59,7 +64,7 @@ public class MainControllerImpl implements MainController {
      */
     @Override
     public void startGame() {
-        new StartMenuView().initialize();
+        new StartMenuView(this).initialize();
     }
 
     /**
@@ -83,6 +88,8 @@ public class MainControllerImpl implements MainController {
     /**
      * {@inheritDoc}
      */
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP",
+        justification = "Exposing 'mapController' is intentional for design reasons.")
     @Override
     public MapController getMapController() {
         return this.mapController;
@@ -118,58 +125,56 @@ public class MainControllerImpl implements MainController {
     @Override
     public void startNewGame(final String username) {
         this.model = new ModelImpl(username);
+        this.model.setUpdateCallback(() -> {
+            SwingUtilities.invokeLater(() -> {
+                this.model.getGameStatistics().updateAllStatistics();
+                this.eventBus.publish(new GameUpdateEvent());
+            });
+        });
+        this.model.setTowerShotCallback(data -> {
+            SwingUtilities.invokeLater(() -> {
+                this.eventBus.publish(new BattleResultEvent(
+                    BattleResultEvent.BattleType.TOWER_VS_SOLDIER,
+                    0, 0, true, data.getFirst(), data.getSecond()
+                ));
+            });
+        });
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean saveGame(final String path) {
-        final ExecutorService executor = Executors.newSingleThreadExecutor();
-        final Callable<Boolean> task = () -> {
-            return this.getGameInstance().saveGame(path);
-        };
-
-        final Future<Boolean> future = executor.submit(task);
-        try {
-            return future.get(TIMEOUT, TimeUnit.SECONDS);
-        } catch (TimeoutException e) {
-            LOGGER.log(Level.SEVERE, "Save game operation timed out", e);
-            return false;
-        } catch (InterruptedException | ExecutionException e) {
-            LOGGER.log(Level.SEVERE, "Error during save game: " + e.getMessage(), e);
-            return false;
-        } finally {
-            executor.shutdownNow();
-        }
+    public CompletableFuture<Boolean> saveGame(final String path) {
+        return CompletableFuture.supplyAsync(() -> this.getGameInstance().saveGame(path));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean loadOldGame(final String path) {
-        final ExecutorService executor = Executors.newSingleThreadExecutor();
-        final Callable<Boolean> task = () -> {
+    public CompletableFuture<Boolean> loadOldGame(final String path) {
+        return CompletableFuture.supplyAsync(() -> {
             try {
                 this.model = new ModelImpl(Optional.ofNullable(path));
+                this.model.setUpdateCallback(() -> {
+                    SwingUtilities.invokeLater(() -> {
+                        this.model.getGameStatistics().updateAllStatistics();
+                        this.eventBus.publish(new GameUpdateEvent());
+                    });
+                });
+                this.model.setTowerShotCallback(data -> {
+                    SwingUtilities.invokeLater(() -> {
+                        this.eventBus.publish(new BattleResultEvent(
+                            BattleResultEvent.BattleType.TOWER_VS_SOLDIER,
+                            0, 0, true, data.getFirst(), data.getSecond()
+                        ));
+                    });
+                });
                 return true;
             } catch (IllegalStateException e) {
                 return false;
             }
-        };
-
-        final Future<Boolean> future = executor.submit(task);
-        try {
-            return future.get(TIMEOUT, TimeUnit.SECONDS);
-        } catch (TimeoutException e) {
-            LOGGER.log(Level.SEVERE, "Load old game timed out", e);
-            return false;
-        } catch (InterruptedException | ExecutionException e) {
-            LOGGER.log(Level.SEVERE, "Error during load old game: " + e.getMessage(), e);
-            return false;
-        } finally {
-            executor.shutdownNow();
-        }
+        });
     }
 }

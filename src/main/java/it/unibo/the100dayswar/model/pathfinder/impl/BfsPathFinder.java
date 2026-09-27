@@ -12,13 +12,16 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import it.unibo.the100dayswar.model.cell.api.Cell;
+import it.unibo.the100dayswar.model.pathfinder.api.PathFinder;
 
 /**
  * A pathfinding implementation using Breadth-First Search (BFS).
  */
-public class BfsPathFinder {
+public class BfsPathFinder implements PathFinder {
 
-    private final List<Cell> allCells;
+    private final Map<Coordinate, Cell> cellMap;
+
+    private record Coordinate(int x, int y) { }
 
     /**
      * Constructor for BfsPathFinder.
@@ -26,7 +29,11 @@ public class BfsPathFinder {
      * @param allCells the list of all cells in the map
      */
     public BfsPathFinder(final Set<Cell> allCells) {
-        this.allCells = new ArrayList<>(allCells);
+        this.cellMap = allCells.stream()
+            .collect(Collectors.toMap(
+                c -> new Coordinate(c.getPosition().getX(), c.getPosition().getY()),
+                c -> c
+            ));
     }
 
     /**
@@ -36,6 +43,7 @@ public class BfsPathFinder {
      * @param destination the destination cell
      * @return a list of cells representing the path, or an empty list if no path exists
      */
+    @Override
     public List<Cell> findPath(final Cell start, final Cell destination) {
         if (start.equals(destination)) {
             return Collections.singletonList(start);
@@ -92,21 +100,17 @@ public class BfsPathFinder {
      * @return a list of adjacent cells that are free
      */
     private List<Cell> getNeighbors(final Cell cell) {
-        return allCells.stream()
-                .filter(c -> isNeighbor(cell, c) && c.isFree())
-                .collect(Collectors.toList());
-    }
+        final int x = cell.getPosition().getX();
+        final int y = cell.getPosition().getY();
+        final List<Cell> neighbors = new ArrayList<>();
 
-    /**
-     * Checks if two cells are neighbors.
-     *
-     * @param cell1 the first cell
-     * @param cell2 the second cell
-     * @return true if the cells are adjacent, false otherwise
-     */
-    private boolean isNeighbor(final Cell cell1, final Cell cell2) {
-        final int dx = Math.abs(cell1.getPosition().getX() - cell2.getPosition().getX());
-        final int dy = Math.abs(cell1.getPosition().getY() - cell2.getPosition().getY());
-        return (dx + dy) == 1;
+        final int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+        for (final int[] dir : directions) {
+            final Cell neighbor = cellMap.get(new Coordinate(x + dir[0], y + dir[1]));
+            if (neighbor != null && neighbor.isFree()) {
+                neighbors.add(neighbor);
+            }
+        }
+        return neighbors;
     }
 }

@@ -13,8 +13,10 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 
 import it.unibo.the100dayswar.commons.utilities.impl.LoadPixelFont;
+import it.unibo.the100dayswar.controller.maincontroller.api.MainController;
 import it.unibo.the100dayswar.view.backgroundpanel.BackgroundPanel;
 import it.unibo.the100dayswar.view.quit.ExitWindowFromPauseMenu;
 import it.unibo.the100dayswar.view.startmenu.StartMenuView;
@@ -40,21 +42,27 @@ public class PauseMenu extends JDialog {
     private static final int POST_INIT_WIDTH = 500;
     private static final int POST_INIT_HEIGHT = 600;
 
+    private final transient MainController mainController;
+
     /**
      * Constructor of the pausing window.
      * 
      * @param parent the panel frame of the pausing window
+     * @param mainController the main controller
      */
-    public PauseMenu(final JFrame parent) {
+    public PauseMenu(final JFrame parent, final MainController mainController) {
         super(parent, "Paused", true);
+        this.mainController = mainController;
     }
 
     /**
      * Initialize the window.
      */
     public void initialize() {
-        buildUI();
-        postInitialization();
+        SwingUtilities.invokeLater(() -> {
+            buildUI();
+            postInitialization();
+        });
     }
 
     /**
@@ -134,26 +142,31 @@ public class PauseMenu extends JDialog {
      * Returns to the main menu.
      */
     private void returnToMainMenu() {
-        if (SaveWindow.saveDialog(this, SAVING_PATH)) {
-            for (final Window window : getWindows()) {
-            if (window instanceof JFrame || window instanceof JDialog) {
-                window.dispose();
+        SaveWindow.saveDialog(this, SAVING_PATH, mainController, saved -> {
+            if (saved) {
+                for (final Window window : getWindows()) {
+                    if (window instanceof JFrame || window instanceof JDialog) {
+                        window.dispose();
+                    }
                 }
+                new StartMenuView(mainController).initialize();
             }
-            new StartMenuView().initialize();
-        }
+        });
     }
 
     /**
      * Quits the game.
      */
     private void exitGame() {
-        if (ExitWindowFromPauseMenu.exitDialog(this) 
-                && SaveWindow.saveDialog(this, SAVING_PATH)) { 
-            final Window[] windows = getWindows();
-            for (final Window window : windows) {
-                window.dispose();
-            }
+        if (ExitWindowFromPauseMenu.exitDialog(this)) {
+            SaveWindow.saveDialog(this, SAVING_PATH, mainController, saved -> {
+                if (saved) {
+                    final Window[] windows = getWindows();
+                    for (final Window window : windows) {
+                        window.dispose();
+                    }
+                }
+            });
         }
     }
 }

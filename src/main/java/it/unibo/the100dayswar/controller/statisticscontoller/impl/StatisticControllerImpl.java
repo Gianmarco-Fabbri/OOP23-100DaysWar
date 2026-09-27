@@ -3,7 +3,7 @@ package it.unibo.the100dayswar.controller.statisticscontoller.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import it.unibo.the100dayswar.application.The100DaysWar;
+import it.unibo.the100dayswar.controller.maincontroller.api.MainController;
 import it.unibo.the100dayswar.controller.statisticscontoller.api.StatisticController;
 import it.unibo.the100dayswar.model.player.api.Player;
 
@@ -11,17 +11,26 @@ import it.unibo.the100dayswar.model.player.api.Player;
  * The implementation of the statistic controller.
  */
 public class StatisticControllerImpl implements StatisticController {
+    private final MainController mainController;
+
+    /**
+     * Constructor.
+     * @param mainController main controller
+     */
+    public StatisticControllerImpl(final MainController mainController) {
+        this.mainController = mainController;
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
     public Integer getSoldiers(final Player player) {
-        return The100DaysWar.CONTROLLER.getGameInstance()
+        return mainController.getGameInstance()
                 .getGameStatistics()
                 .getSoldiers()
                 .getSecond()
-                .get(The100DaysWar.CONTROLLER.getGameInstance()
+                .get(mainController.getGameInstance()
                     .getGameStatistics()
                     .getSoldiers()
                     .getFirst().indexOf(player));
@@ -32,11 +41,11 @@ public class StatisticControllerImpl implements StatisticController {
      */
     @Override
     public Integer getTowers(final Player player) {
-        return The100DaysWar.CONTROLLER.getGameInstance()
+        return mainController.getGameInstance()
                 .getGameStatistics()
                 .getTowers()
                 .getSecond()
-                .get(The100DaysWar.CONTROLLER.getGameInstance()
+                .get(mainController.getGameInstance()
                     .getGameStatistics()
                     .getTowers()
                     .getFirst().indexOf(player));
@@ -47,11 +56,11 @@ public class StatisticControllerImpl implements StatisticController {
      */
     @Override
     public Double getCellsPercentage(final Player player) {
-        return The100DaysWar.CONTROLLER.getGameInstance()
+        return mainController.getGameInstance()
                 .getGameStatistics()
                 .getCellsPercentage()
                 .getSecond()
-                .get(The100DaysWar.CONTROLLER.getGameInstance()
+                .get(mainController.getGameInstance()
                     .getGameStatistics()
                     .getCellsPercentage()
                     .getFirst().indexOf(player));
@@ -62,11 +71,11 @@ public class StatisticControllerImpl implements StatisticController {
      */
     @Override
     public Integer getBalance(final Player player) {
-        return The100DaysWar.CONTROLLER.getGameInstance()
+        return mainController.getGameInstance()
                 .getGameStatistics()
                 .getBalances()
                 .getSecond()
-                .get(The100DaysWar.CONTROLLER.getGameInstance()
+                .get(mainController.getGameInstance()
                     .getGameStatistics()
                     .getBalances()
                     .getFirst().indexOf(player));
@@ -77,7 +86,7 @@ public class StatisticControllerImpl implements StatisticController {
      */
     @Override
     public List<Player> getPlayers() {
-        return new ArrayList<>(The100DaysWar.CONTROLLER.getGameInstance()
+        return new ArrayList<>(mainController.getGameInstance()
         .getGameStatistics()
         .getBalances()
         .getFirst());
@@ -88,7 +97,7 @@ public class StatisticControllerImpl implements StatisticController {
      */
    @Override 
     public void updateStatistics() {
-        The100DaysWar.CONTROLLER.getGameInstance().getGameStatistics().updateAllStatistics();
+        mainController.getGameInstance().getGameStatistics().updateAllStatistics();
     }
 
 }

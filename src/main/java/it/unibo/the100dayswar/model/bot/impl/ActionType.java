@@ -10,8 +10,6 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import com.google.common.collect.Iterables;
-
 import it.unibo.the100dayswar.commons.patterns.Observable;
 import it.unibo.the100dayswar.commons.patterns.Observer;
 import it.unibo.the100dayswar.commons.utilities.impl.Pair;
@@ -25,6 +23,7 @@ import it.unibo.the100dayswar.model.tower.api.TowerType;
 import it.unibo.the100dayswar.model.tower.impl.BasicTowerImpl;
 import it.unibo.the100dayswar.model.unit.api.Unit;
 import it.unibo.the100dayswar.model.tower.api.Tower;
+import it.unibo.the100dayswar.model.pathfinder.api.PathFinder;
 
 /**
  * An enum that represents the possible actions that a bot can take.
@@ -66,14 +65,15 @@ public enum ActionType {
             if (canPerform(botPlayer)) {
                 final Soldier soldier = new SoldierImpl(botPlayer);
                 attachObserverToUnit(soldier);
-                //notifyObservers(new Pair<>(soldier, botPlayer.getSpawnPoint()));
+                // notifyObservers(new Pair<>(soldier, botPlayer.getSpawnPoint()));
                 botPlayer.buyUnit(soldier);
             }
         }
     },
 
     /**
-     * Represents the action of purchasing a tower in a random position near the spawn point
+     * Represents the action of purchasing a tower in a random position near the
+     * spawn point
      * so the tower can defend it.
      */
     PURCHASE_TOWER {
@@ -114,7 +114,7 @@ public enum ActionType {
                     final Tower tower = new BasicTowerImpl(botPlayer, towerPosition);
                     attachObserverToUnit(tower);
                     botPlayer.buyUnit(tower);
-                    //notifyObservers(new Pair<>(tower, tower.getPosition()));
+                    // notifyObservers(new Pair<>(tower, tower.getPosition()));
                 }
             }
         }
@@ -154,7 +154,8 @@ public enum ActionType {
 
     /**
      * Represents the action of upgrading a unit.
-     * For a simpler logic, this action will upgrade the unit with the lowest cost to upgrade.
+     * For a simpler logic, this action will upgrade the unit with the lowest cost
+     * to upgrade.
      */
     UPGRADE_UNIT {
         private static final int BASE_SCORE = 2;
@@ -234,8 +235,9 @@ public enum ActionType {
             final Set<Soldier> soldiers = botPlayer.getSoldiers();
             if (canPerform(botPlayer)) {
                 // Choose a random soldier
-                final Soldier unitToMove = Iterables.get(soldiers, RANDOM.nextInt(soldiers.size()));
-                // Using BFS algorithm to find the next cell in the path to the enemy spawn point
+                final Soldier unitToMove = List.copyOf(soldiers).get(RANDOM.nextInt(soldiers.size()));
+                // Using BFS algorithm to find the next cell in the path to the enemy spawn
+                // point
                 final Cell destination = determineDestination(botPlayer, unitToMove);
                 if (destination != null && destination.isFree()) {
                     notifyObservers(new Pair<>(unitToMove, destination));
@@ -251,7 +253,7 @@ public enum ActionType {
          * @return the destination cell
          */
         private Cell determineDestination(final BotPlayer botPlayer, final Unit unit) {
-            final BfsPathFinder pathFinder = new BfsPathFinder(botPlayer.getAllCells());
+            final PathFinder pathFinder = new BfsPathFinder(botPlayer.getAllCells());
             final Cell start = unit.getPosition();
             final Cell destination = botPlayer.getEnemySpawnPoint();
             if (start == null || destination == null) {
@@ -276,7 +278,7 @@ public enum ActionType {
     private static final ActionNotifier NOTIFIER = new ActionNotifier();
 
     /**
-     * A static class, shared by all types of this enum, that has the 
+     * A static class, shared by all types of this enum, that has the
      * task of manage the observers of the actions.
      */
     private static final class ActionNotifier implements Observable<Pair<Unit, Cell>>, Serializable {
@@ -285,6 +287,7 @@ public enum ActionType {
 
         /**
          * Return the set of observers.
+         *
          * @return the set of observers
          */
         public Set<Observer<Pair<Unit, Cell>>> getObservers() {
@@ -394,11 +397,13 @@ public enum ActionType {
     protected abstract void execute(BotPlayer botPlayer);
 
     /**
-     * Utility method that returns a non-performable score if the action can't be performed,
+     * Utility method that returns a non-performable score if the action can't be
+     * performed,
      * otherwise calculates the score with the provided scorer.
      *
      * @param botPlayer the bot player
-     * @param scorer    a supplier that provides the score if the action can be performed
+     * @param scorer    a supplier that provides the score if the action can be
+     *                  performed
      * @return the score of the action
      */
     protected Score evaluateOrNonPerformable(final BotPlayer botPlayer, final Supplier<Score> scorer) {
